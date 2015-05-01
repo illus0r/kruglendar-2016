@@ -1,0 +1,5 @@
+В этом году я наконец узнал про великий и ужасный d3.js. Это то, что я искал уже не один год - гениально удобная работа с svg, результат можно немедленно увидеть в браузере. Я в восторге. Как только стал соображать, что к чему, набросился и начал свои безумные эксперименты в посках новой формы календаря. От диаграмы воронова до физического моделирования движения частиц. Выходило прикольно, но победы не проглядывало.
+
+В прошлом году круглиндарь освободился от кучи ненужных линий, осталось две. В этом году упростим ещё немного: пусть линия будет одна. Эксперименируя с различными формами, остановился на [гипотрахоиде](https://en.wikipedia.org/wiki/Hypotrochoid) (простите).
+
+Такой график получился на [fooplot](http://fooplot.com/#W3sidHlwZSI6MiwiZXF4IjoiKDEyLTEpKmNvcyhzKSswLjYqY29zKCgxMi0oMSkpKnMvKDEpKSIsImVxeSI6IigxMi0xKSpzaW4ocyktMC42KnNpbigoMTItKDEpKSpzLygxKSkiLCJjb2xvciI6IiNmZjAwMDAiLCJzbWluIjoiMCIsInNtYXgiOiIycGkiLCJzc3RlcCI6Ii4wMSJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIi0zMy4xNTA4Njk4ODU2NjI0NSIsIjE2LjQ0MDE5NDU2NzQ2MjQ2MyIsIi0xNi40NzE0NjM2MzU2MDc0NSIsIjE0LjA0NjExNDQ4OTM5MjQ3NCJdfV0-)
