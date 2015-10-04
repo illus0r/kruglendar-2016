@@ -21,6 +21,12 @@ var d = 0.5*r;// drawing point distance
 //helpers
 var cos = Math.cos, sin = Math.sin;
 var pi = Math.PI;
+
+
+// finding point on hypotrachoid for an angle
+// takes angle in radians
+// returns two points for [x, y]
+//
 function hypotrochoid(alpha){
 	var shift = Math.PI*2*(gap/2);
 	//shift = 0;
@@ -107,6 +113,20 @@ function render(){
 		.attr({
 			d: line(points),
 		});
+  //just for test and refreshing memory: add some circles to path.
+  calendar.selectAll("circle")
+    .data(points)
+    .enter()
+    .append("circle")
+    .attr({
+      cx: function(d){
+        return d[0];
+      },
+      cy: function(d){
+        return d[1];
+      },
+      r: 0.5
+    });
 }
 
 render();
