@@ -13,6 +13,11 @@ var date_font_size = 1*svg_size/500;
 //others
 var dates_span = [new Date(2016, 0, 1), new Date(2016, 11, 31)];
 var date_format = d3.time.format("%B %d");
+var date_format_num = d3.time.format("%_d");
+var font_family = "Sorren Ex SemiBold";
+//var font_family = "Ubuntu Mono";
+//font-family: 'Sorren Ex Bold'
+//font-family: 'Sorren Ex Medium'
 
 //processing some vars
 r *= (1-gap) // gap couse inner radius to be smaller
@@ -78,6 +83,10 @@ var scale_date_angle = d3.scale.linear()
 dates = dates.map(function(i){
 	return {date: i, angle: scale_date_angle(i)};
 });
+var dates_num = dates.map(function(d){
+    return date_format_num(d.date);
+}).join(" ");
+//console.log(dates_num);
 
 var svg = d3.select("body")
 	.append("svg")
@@ -101,47 +110,59 @@ var calendar = svg.append("g")
 		+ ")");
 var dates_text = calendar.append("g")
   .classed("dates-text", true);
-var date_g = dates_text.selectAll("g.date")
-  .data(dates)
-  .enter()
-  .append("g")
-  .attr("transform", function(d){ 
-    var rotation = (d.angle-2*pi*gap)*180/pi + 90;
-    // TODO Arrrr, why this works?
-    return "rotate("+ rotation +")"; 
-  })
-  .classed("date", true)
-  .append("text")
-  .text(function(d){
-    return date_format(d.date);
-  })
-  .attr({
-    x: function(d){
-      return theta2ro(d.angle);
-    },
-    y: 0
-  });
+//var date_g = dates_text.selectAll("g.date")
+  //.data(dates)
+  //.enter()
+  //.append("g")
+  //.attr("transform", function(d){ 
+    //var rotation = (d.angle-2*pi*gap)*180/pi + 90;
+    //// TODO Arrrr, why this works?
+    //return "rotate("+ rotation +")"; 
+  //})
+  //.classed("date", true)
+  //.append("text")
+  //.text(function(d){
+    //return date_format(d.date);
+  //})
+  //.attr({
+    //x: function(d){
+      //return theta2ro(d.angle);
+    //},
+    //y: 0
+  //});
 
-
+// Test text string to get to know font-size for calendar
+var textTmp = calendar.append("text")
+  .style("font-size", "1px")
+  .style("font-family", font_family)
+  .text(dates_num);
 
 function render(){
-	// calendar shape
-  var points_orig = d3.range(0, 2*pi*(1-gap), 0.01)
-    .map(function(psi){
-      return psi2thetaRo(psi);
-    });
+  var textTmpLength = textTmp.node().getComputedTextLength();
+  //textTmp.remove();
+
   var points = d3.range(-pi*(1-2*gap), pi, 0.01)
     .map(function(theta){
       return [theta, theta2ro(theta)];
     });
 	var line = d3.svg.line();
-		//.x()
-		//.y()
-	//calendar.append("path")
-		//.classed("calendar-shape", true)
-		//.attr({
-			//d: line(points_orig.map(function(d){return [d[1]*sin(d[0]), d[1]*cos(d[0])]})),
-		//});
+
+  // Take path length
+  var hypotrochoid = calendar.append("path")
+    .classed("calendar-shape", true)
+    .attr({
+      d: line(points.reverse().map(function(d){return [d[1]*sin(d[0]), d[1]*cos(d[0])]})),
+      id: "hypotrochoid",
+    });
+  var hypotrochoidLength = hypotrochoid.node().getTotalLength();
+
+  calendar.append("text")
+    .append("textPath")
+    .attr("xlink:href","#hypotrochoid")
+    .style("font-size", hypotrochoidLength/textTmpLength)
+    .style("font-family", font_family)
+//font-family: 'Sorren Ex Bold'
+    .text(dates_num);
   ////just for test and refreshing memory: add some circles to path.
   //calendar.selectAll("circle")
     //.data(points)
@@ -171,4 +192,4 @@ function render(){
     //});
 }
 
-render();
+//render();
