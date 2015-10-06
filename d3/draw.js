@@ -4,7 +4,7 @@ var svg_size = [500, 500],
     center = [0.5, 0.5];
 //abs
 //var gap = 0.1, // gap for new year
-var gap = 0.04, // gap for new year
+var gap = 0.016, // gap for new year
 	//angle_newyear = -Math.PI / 2,
 	angle_newyear = 0,
 	R = 0.4*svg_size[0], // outer radius
@@ -12,10 +12,8 @@ var gap = 0.04, // gap for new year
 var date_font_size = 1*svg_size/500;
 //others
 var dates_span = [new Date(2016, 0, 1), new Date(2016, 11, 31)];
-var date_format = d3.time.format("%B %d");
-var date_format_num = d3.time.format("%_d");
-var font_family = "Sorren Ex SemiBold";
-//var font_family = "Ubuntu Mono";
+//var font_family = "Sorren Ex SemiBold";
+var font_family = "Ubuntu Mono";
 //font-family: 'Sorren Ex Bold'
 //font-family: 'Sorren Ex Medium'
 
@@ -27,27 +25,32 @@ var d = 0.5*r;// drawing point distance
 var cos = Math.cos, sin = Math.sin;
 var pi = Math.PI;
 
-// finding point on hypotrachoid for an angle
-// takes angle in radians
+
+
+
+
+// Functions
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+// for hypotrochoid finds couple [theta, ro] for given psi (angle to rolling circle)
+// takes angle psi in radians
 // returns theta (angle to point) and ro (distance to point)
 //
 function psi2thetaRo(psi){
 	//var shift = Math.PI*(gap/2);
-  shift = 0;
+  var shift = 0;
 	x =  ((R-r)*sin(psi  + shift ) + d*sin((R-(r))*psi/(r)  - shift  - pi));
 	y = -(R-r)*cos(psi  + shift )
 		+ d*cos((R-(r))*psi/(r)  - shift  - pi);
   var theta = Math.atan2(x,y);
-  return [theta, Math.sqrt(x*x+y*y)];
+  var ro = Math.sqrt(x*x+y*y);
+  return [theta, ro];
 }
 
-// We fill rawArray with extra detailed ro(psi) hyportohoid data
-// and use it later for interpolation in ro(theta)
-var rawArray = d3.range(0, pi*2, 0.001).map(psi2thetaRo);
-console.log(rawArray[400]);
-
 // finds item in array [theta, ro] with theta closest to num
-// takes num and arr (sorted by theta)
+// takes num and arr (sorted by theta!)
 // returns array index
 function closest (num, arr) {
     var curr = arr[0];
@@ -64,36 +67,82 @@ function closest (num, arr) {
     return index;
 }
 
+// for hypotrochoid finds ro by theta (distance to point by angle)
+// takes theta
+// returns ro (wow)
 function theta2ro(theta){
-  //interpolating rawArray to find nearest to angle point
-  var closestArrayItemIndex = closest(theta, rawArray.map(function(d){
+  var closestArrayItemIndex = closest(theta, hypotrochoidArray.map(function(d){
     return d[0];
   }));
-  return rawArray[closestArrayItemIndex][1];
+  return hypotrochoidArray[closestArrayItemIndex][1];
 }
 
+
+
+
+
+// Arrays
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+// fill hypotrochoidArray with extra detailed ro(psi) hyportohoid data
+// and use it later for interpolation in ro(theta)
+var hypotrochoidArray = d3.range(0, pi*2, 0.001).map(psi2thetaRo);
+// data in hypotrochoidArray is extradetailed now. 
+// We'll keep just 365 points we need
+hypotrochoidArray = d3.range(-pi*(1-2*gap), pi, 0.01)
+  .map(function(theta){
+    return [theta, theta2ro(theta)];
+  });
+
 // date array
-//
+//var date_format = d3.time.format("%B %d");
+var dateFormatDate = d3.time.format("%-d");
+var dateFormatDay = d3.time.format("%A");
+//var dateFormatMonth = d3.time.format("%B");
+var dateFormatMonth = d3.time.format("%-m");
 var dates = d3.time.scale()
 	.domain(dates_span)
-	.ticks(d3.time.days, 1);
-var scale_date_angle = d3.scale.linear()
-	.domain(dates_span)
-  .range([-pi*(1-2*gap), pi]);
-dates = dates.map(function(i){
-	return {date: i, angle: scale_date_angle(i)};
-});
-var dates_num = dates.map(function(d){
-    return date_format_num(d.date);
-}).join(" ");
+	.ticks(d3.time.days, 1)
+  .map(function(d){
+    return {
+      date: dateFormatDate(d), 
+      weekend: (dateFormatDay(d) == "Saturday" || dateFormatDay(d) == "Sunday"), 
+      month: dateFormatMonth(d),
+    };
+  });
+var datesString = dates.map(function(d){return d.date;}).join(" ");
+
+//console.log(dates);
+//var scale_date_angle = d3.scale.linear()
+	//.domain(dates_span)
+  //.range([-pi*(1-2*gap), pi]);
+//dates = dates.map(function(i){
+	//return {date: i, angle: scale_date_angle(i)};
+//});
+//var dates_num = dates.map(function(d){
+    //return date_format_num(d.date);
+//}).join(" ");
 //console.log(dates_num);
 
+
+
+
+
+// Drawing SVG
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+// SVG
 var svg = d3.select("body")
 	.append("svg")
 	.attr({
 		width: svg_size[0],
 		height: svg_size[1]	
 	});
+// Helper circle
 svg.append("circle")
 	.attr({
 		cx: svg_size[0]*center[0],
@@ -101,16 +150,23 @@ svg.append("circle")
 		r: R
 	})
 	.classed("circle", true);
+// Whole calender will be stored in this var
 var calendar = svg.append("g")
 	.attr("transform", 
 		"translate("
-		+ svg_size[0]*center[0] + "," + svg_size[1]*center[1]
+		+ svg_size[0]*center[0] 
+    + "," 
+    + svg_size[1]*center[1]
 		+ ") rotate("
 		+ (angle_newyear + 2*pi*gap/2)*180/pi
 		+ ")");
-var dates_text = calendar.append("g")
-  .classed("dates-text", true);
-//var date_g = dates_text.selectAll("g.date")
+
+// Text objects
+var text_dates = calendar.append("g")
+  .classed("text-dates", true);
+var text_monthes = calendar.append("g")
+  .classed("text-monthes", true);
+//var date_g = text_dates.selectAll("g.date")
   //.data(dates)
   //.enter()
   //.append("g")
@@ -135,61 +191,64 @@ var dates_text = calendar.append("g")
 var textTmp = calendar.append("text")
   .style("font-size", "1px")
   .style("font-family", font_family)
-  .text(dates_num);
+  .text(datesString);
 
-function render(){
-  var textTmpLength = textTmp.node().getComputedTextLength();
-  //textTmp.remove();
 
-  var points = d3.range(-pi*(1-2*gap), pi, 0.01)
-    .map(function(theta){
-      return [theta, theta2ro(theta)];
-    });
-	var line = d3.svg.line();
 
-  // Take path length
-  var hypotrochoid = calendar.append("path")
-    .classed("calendar-shape", true)
-    .attr({
-      d: line(points.reverse().map(function(d){return [d[1]*sin(d[0]), d[1]*cos(d[0])]})),
-      id: "hypotrochoid",
-    });
-  var hypotrochoidLength = hypotrochoid.node().getTotalLength();
 
-  calendar.append("text")
-    .append("textPath")
-    .attr("xlink:href","#hypotrochoid")
-    .style("font-size", hypotrochoidLength/textTmpLength)
-    .style("font-family", font_family)
-//font-family: 'Sorren Ex Bold'
-    .text(dates_num);
-  ////just for test and refreshing memory: add some circles to path.
-  //calendar.selectAll("circle")
-    //.data(points)
-    //.enter()
-    //.append("circle")
-    //.attr({
-      //cx: function(d){
-        //console.log(d[0]);
-        //return d[1]*sin(d[0]);
-      //},
-      //cy: function(d){
-        //return d[1]*cos(d[0]);
-      //},
-      //r: 0.4,
-      //fill: "red"
-    //});
-  //calendar.append("circle")
-    //.attr({
-      //cx: function(d){
-        //return R*sin(0);
-      //},
-      //cy: function(d){
-        //return R*cos(0);
-      //},
-      //r: 2,
-      //fill: "red"
-    //});
-}
 
-//render();
+// Render
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+// Draw hypotrochoid path
+var line = d3.svg.line();
+var hypotrochoid = calendar.append("path")
+  .classed("calendar-shape", true)
+  .attr({
+    d: line(hypotrochoidArray.reverse().map(function(d){return [d[1]*sin(d[0]), d[1]*cos(d[0])]})),
+    id: "hypotrochoid",
+  });
+
+// Now 
+// Measure path length
+var hypotrochoidLength = hypotrochoid.node().getTotalLength();
+// should be measures after fonts are loaded
+var textTmpLength = textTmp.node().getComputedTextLength();
+//textTmp.remove();
+
+calendar.append("text")
+  .append("textPath")
+  .attr("xlink:href","#hypotrochoid")
+  .style("font-size", hypotrochoidLength/textTmpLength)
+  .style("font-family", font_family)
+  .text(datesString);
+////just for test and refreshing memory: add some circles to path.
+//calendar.selectAll("circle")
+  //.data(hypotrochoidArray)
+  //.enter()
+  //.append("circle")
+  //.attr({
+    //cx: function(d){
+      //console.log(d[0]);
+      //return d[1]*sin(d[0]);
+    //},
+    //cy: function(d){
+      //return d[1]*cos(d[0]);
+    //},
+    //r: 0.4,
+    //fill: "red"
+  //});
+// Point do start polar coordinates
+//calendar.append("circle")
+  //.attr({
+    //cx: function(d){
+      //return R*sin(0);
+    //},
+    //cy: function(d){
+      //return R*cos(0);
+    //},
+    //r: 2,
+    //fill: "red"
+  //});
