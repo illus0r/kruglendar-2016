@@ -11,19 +11,20 @@ var gap = 0.016, // gap for new year
 	r = R/12; // inner radius
 var date_font_size = 1*svg_size/500;
 //others
-var dates_span = [new Date(2016, 0, 1), new Date(2016, 11, 31)];
+var datesSpan = [new Date(2016, 0, 1), new Date(2016, 11, 31)];
 //var font_family = "Sorren Ex SemiBold";
 var font_family = "Ubuntu Mono";
 //font-family: 'Sorren Ex Bold'
 //font-family: 'Sorren Ex Medium'
 
-//processing some vars
-r *= (1-gap) // gap couse inner radius to be smaller
-var d = 0.5*r;// drawing point distance
-
 //helpers
 var cos = Math.cos, sin = Math.sin;
 var pi = Math.PI;
+
+//processing some vars
+r *= (1-gap) // gap couse inner radius to be smaller
+var d = 0.5*r;// drawing point distance
+var hypotrochoidAngleSpan = 2*pi*(1-gap);
 
 
 
@@ -71,10 +72,10 @@ function closest (num, arr) {
 // takes theta
 // returns ro (wow)
 function theta2ro(theta){
-  var closestArrayItemIndex = closest(theta, hypotrochoidArray.map(function(d){
+  var closestArrayItemIndex = closest(theta, hypotrochoidArrayRaw.map(function(d){
     return d[0];
   }));
-  return hypotrochoidArray[closestArrayItemIndex][1];
+  return hypotrochoidArrayRaw[closestArrayItemIndex][1];
 }
 
 
@@ -88,9 +89,10 @@ function theta2ro(theta){
 
 // fill hypotrochoidArray with extra detailed ro(psi) hyportohoid data
 // and use it later for interpolation in ro(theta)
-var hypotrochoidArray = d3.range(0, pi*2, 0.001).map(psi2thetaRo);
+var hypotrochoidArrayRaw = d3.range(0, pi*2, 0.001).map(psi2thetaRo);
 // data in hypotrochoidArray is extradetailed now. 
 // We'll keep just 365 points we need
+//hypotrochoidArray = d3.range(-pi*(1-2*gap), pi, 0.01)
 hypotrochoidArray = d3.range(-pi*(1-2*gap), pi, 0.01)
   .map(function(theta){
     return [theta, theta2ro(theta)];
@@ -102,21 +104,41 @@ var dateFormatDate = d3.time.format("%-d");
 var dateFormatDay = d3.time.format("%A");
 //var dateFormatMonth = d3.time.format("%B");
 var dateFormatMonth = d3.time.format("%-m");
+//var datesString = dates.map(function(d){return d.date;}).join(" ");
+var datesString = "";
 var dates = d3.time.scale()
-	.domain(dates_span)
+	.domain(datesSpan)
 	.ticks(d3.time.days, 1)
   .map(function(d){
+    var date = dateFormatDate(d); 
+    datesString += date.toString() + " ";
+    // text object for measuring
+    var textTmp = d3.select("body")
+      .append("svg")
+      .classed("tmp", true)
+      .append("text")
+      .style("font-size", "1px")
+      .style("font-family", font_family)
+      .text(datesString);
+    var textTmpLength = textTmp.node().getComputedTextLength();
+    d3.selectAll("svg.tmp").remove();
     return {
-      date: dateFormatDate(d), 
+      theta: textTmpLength, // will be converted to radians after this map is over
+      date: date, 
       weekend: (dateFormatDay(d) == "Saturday" || dateFormatDay(d) == "Sunday"), 
       month: dateFormatMonth(d),
     };
   });
-var datesString = dates.map(function(d){return d.date;}).join(" ");
+//normalizing theta for every date
+var datesStringLength = dates[dates.length-1].theta;
+//console.log(datesStringLength);
+dates.map(function(d){
+  d.theta = 2*pi*(1-gap) * d.theta/datesStringLength -pi*(1-gap);
+});
 
 //console.log(dates);
 //var scale_date_angle = d3.scale.linear()
-	//.domain(dates_span)
+	//.domain(datesSpan)
   //.range([-pi*(1-2*gap), pi]);
 //dates = dates.map(function(i){
 	//return {date: i, angle: scale_date_angle(i)};
@@ -166,26 +188,27 @@ var text_dates = calendar.append("g")
   .classed("text-dates", true);
 var text_monthes = calendar.append("g")
   .classed("text-monthes", true);
-//var date_g = text_dates.selectAll("g.date")
-  //.data(dates)
-  //.enter()
-  //.append("g")
-  //.attr("transform", function(d){ 
+var date_g = text_dates.selectAll("g.date")
+  .data(dates)
+  .enter()
+  .append("g")
+  .attr("transform", function(d){ 
     //var rotation = (d.angle-2*pi*gap)*180/pi + 90;
-    //// TODO Arrrr, why this works?
-    //return "rotate("+ rotation +")"; 
-  //})
-  //.classed("date", true)
-  //.append("text")
-  //.text(function(d){
-    //return date_format(d.date);
-  //})
-  //.attr({
-    //x: function(d){
-      //return theta2ro(d.angle);
-    //},
-    //y: 0
-  //});
+    var rotation = d.theta * 180/pi;
+    // TODO Arrrr, why this works?
+    return "rotate("+ rotation +")"; 
+  })
+  .classed("date", true)
+  .append("text")
+  .text(function(d){
+    return d.date;
+  })
+  .attr({
+    x: 0,
+    y: function(d){
+      return -theta2ro(d.theta);
+    }
+  });
 
 // Test text string to get to know font-size for calendar
 var textTmp = calendar.append("text")
@@ -218,12 +241,14 @@ var hypotrochoidLength = hypotrochoid.node().getTotalLength();
 var textTmpLength = textTmp.node().getComputedTextLength();
 //textTmp.remove();
 
-calendar.append("text")
-  .append("textPath")
-  .attr("xlink:href","#hypotrochoid")
-  .style("font-size", hypotrochoidLength/textTmpLength)
-  .style("font-family", font_family)
-  .text(datesString);
+//// text by path
+//calendar.append("text")
+  //.append("textPath")
+  //.attr("xlink:href","#hypotrochoid")
+  //.style("font-size", hypotrochoidLength/textTmpLength)
+  //.style("font-family", font_family)
+  //.text(datesString);
+
 ////just for test and refreshing memory: add some circles to path.
 //calendar.selectAll("circle")
   //.data(hypotrochoidArray)
