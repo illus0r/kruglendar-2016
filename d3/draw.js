@@ -5,6 +5,7 @@ var svg_size = [500, 500],
 //abs
 //var gap = 0.1, // gap for new year
 var gap = 0.016, // gap for new year
+//var gap = 1/10., // gap for new year
 	//angle_newyear = -Math.PI / 2,
 	angle_newyear = 0,
 	R = 0.4*svg_size[0], // outer radius
@@ -22,7 +23,7 @@ var cos = Math.cos, sin = Math.sin;
 var pi = Math.PI;
 
 //processing some vars
-r *= (1-gap) // gap couse inner radius to be smaller
+r *= (1-gap) // gap cause inner radius to be smaller
 var d = 0.5*r;// drawing point distance
 var hypotrochoidAngleSpan = 2*pi*(1-gap);
 
@@ -40,12 +41,19 @@ var hypotrochoidAngleSpan = 2*pi*(1-gap);
 // returns theta (angle to point) and ro (distance to point)
 //
 function psi2thetaRo(psi){
-	//var shift = Math.PI*(gap/2);
+  console.log("psi = " + psi);
+  //var shift = Math.PI*2*0.3;
   var shift = 0;
-	x =  ((R-r)*sin(psi  + shift ) + d*sin((R-(r))*psi/(r)  - shift  - pi));
-	y = -(R-r)*cos(psi  + shift )
-		+ d*cos((R-(r))*psi/(r)  - shift  - pi);
+	x =  (R-r)*sin(psi+shift) 
+      + d * sin( (R-r)*psi/r - shift - pi );
+	y = -(R-r)*cos(psi+shift)
+		  + d * cos( (R-r)*psi/r - shift - pi );
   var theta = Math.atan2(x,y);
+  theta = pi - theta;
+  if (theta<0){
+    theta = theta + 2*pi;
+  }
+  console.log("theta = " + theta);
   var ro = Math.sqrt(x*x+y*y);
   return [theta, ro];
 }
@@ -69,12 +77,17 @@ function closest (num, arr) {
 }
 
 // for hypotrochoid finds ro by theta (distance to point by angle)
+// uses ready array of hypotrochoid points hypotrochoidArrayRaw
 // takes theta
 // returns ro (wow)
-function theta2ro(theta){
+function theta2ro(theta){ // TODO Ты неправильно работаешь, шайтан
   var closestArrayItemIndex = closest(theta, hypotrochoidArrayRaw.map(function(d){
     return d[0];
   }));
+  //var d = Math.abs(theta-hypotrochoidArrayRaw[closestArrayItemIndex][0]);
+  //if (d>0.01){
+    //console.log(d);
+  //}
   return hypotrochoidArrayRaw[closestArrayItemIndex][1];
 }
 
@@ -82,6 +95,14 @@ function theta2ro(theta){
 
 
 
+//
+//          AAAAAA
+//          A    A
+//          A    A
+//          AAAAAA
+//          A    A
+//
+//
 // Arrays
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -89,14 +110,22 @@ function theta2ro(theta){
 
 // fill hypotrochoidArray with extra detailed ro(psi) hyportohoid data
 // and use it later for interpolation in ro(theta)
-var hypotrochoidArrayRaw = d3.range(0, pi*2, 0.001).map(psi2thetaRo);
+var hypotrochoidArrayRaw = d3.range(0.0001, hypotrochoidAngleSpan, 0.001).map(psi2thetaRo);
+//hypotrochoidArrayRaw.map(function(d){
+  //console.log(d[0]);
+//});
+//hypotrochoidArrayRaw = hypotrochoidArrayRaw.sort(function(a,b){if(a[0]<b[0]){return 1;} else{if(a[0]>b[0]){return -1;} else return 0;}});
+//hypotrochoidArrayRaw = hypotrochoidArrayRaw.reverse();
 // data in hypotrochoidArray is extradetailed now. 
 // We'll keep just 365 points we need
+var hypotrochoidArray = hypotrochoidArrayRaw;
 //hypotrochoidArray = d3.range(-pi*(1-2*gap), pi, 0.01)
-hypotrochoidArray = d3.range(-pi*(1-2*gap), pi, 0.01)
-  .map(function(theta){
-    return [theta, theta2ro(theta)];
-  });
+//var hypotrochoidArray = d3.range(0, hypotrochoidAngleSpan, 0.01)
+  //.map(function(theta){
+    //return [theta, theta2ro(theta)];
+  //});
+//console.log(hypotrochoidArrayRaw);  -pi — pi
+//console.log(hypotrochoidArray);    // 2pi — 0
 
 // date array
 //var date_format = d3.time.format("%B %d");
@@ -131,12 +160,10 @@ var dates = d3.time.scale()
   });
 //normalizing theta for every date
 var datesStringLength = dates[dates.length-1].theta;
-//console.log(datesStringLength);
 dates.map(function(d){
-  d.theta = 2*pi*(1-gap) * d.theta/datesStringLength -pi*(1-gap);
+  d.theta = hypotrochoidAngleSpan * d.theta/datesStringLength;
 });
 
-//console.log(dates);
 //var scale_date_angle = d3.scale.linear()
 	//.domain(datesSpan)
   //.range([-pi*(1-2*gap), pi]);
@@ -146,7 +173,6 @@ dates.map(function(d){
 //var dates_num = dates.map(function(d){
     //return date_format_num(d.date);
 //}).join(" ");
-//console.log(dates_num);
 
 
 
@@ -179,9 +205,11 @@ var calendar = svg.append("g")
 		+ svg_size[0]*center[0] 
     + "," 
     + svg_size[1]*center[1]
-		+ ") rotate("
-		+ (angle_newyear + 2*pi*gap/2)*180/pi
-		+ ")");
+		+ ")"
+    //+ " rotate("
+    //+ (angle_newyear + 2*pi*gap/2)*180/pi
+    //+ ")"
+    );
 
 // Text objects
 var text_dates = calendar.append("g")
@@ -192,22 +220,31 @@ var date_g = text_dates.selectAll("g.date")
   .data(dates)
   .enter()
   .append("g")
-  .attr("transform", function(d){ 
-    //var rotation = (d.angle-2*pi*gap)*180/pi + 90;
-    var rotation = d.theta * 180/pi;
-    // TODO Arrrr, why this works?
-    return "rotate("+ rotation +")"; 
-  })
+  //.attr("transform", function(d){ 
+    ////var rotation = (d.angle-2*pi*gap)*180/pi + 90;
+    //var rotation = d.theta * 180/pi;
+    //// TODO Arrrr, why this works?
+    //return "rotate("+ rotation +")"; 
+  //})
   .classed("date", true)
   .append("text")
   .text(function(d){
     return d.date;
   })
   .attr({
-    x: 0,
+    x: function(d){
+      //console.log(d.theta);
+      return theta2ro(d.theta)*sin(d.theta);
+    },
     y: function(d){
-      return -theta2ro(d.theta);
+      //console.log(d.theta);
+      return theta2ro(d.theta)*cos(d.theta);
     }
+    //x: 0,
+    //y: function(d){
+      ////console.log(d.theta);
+      //return -theta2ro(d.theta);
+    //}
   });
 
 // Test text string to get to know font-size for calendar
@@ -227,10 +264,17 @@ var textTmp = calendar.append("text")
 
 // Draw hypotrochoid path
 var line = d3.svg.line();
+//var hypotrochoidRaw = calendar.append("path")
+  //.classed("calendar-shape", true)
+  //.attr({
+    //d: line(hypotrochoidArrayRaw.map(function(d){return [d[1]*sin(d[0]), d[1]*cos(d[0])]})),
+    //id: "hypotrochoidRaw",
+    //style: "opacity: 0.09; stroke-width: 5px;"
+  //});
 var hypotrochoid = calendar.append("path")
   .classed("calendar-shape", true)
   .attr({
-    d: line(hypotrochoidArray.reverse().map(function(d){return [d[1]*sin(d[0]), d[1]*cos(d[0])]})),
+    d: line(hypotrochoidArray.map(function(d){return [d[1]*sin(d[0]), d[1]*cos(d[0])]})),
     id: "hypotrochoid",
   });
 
@@ -256,7 +300,6 @@ var textTmpLength = textTmp.node().getComputedTextLength();
   //.append("circle")
   //.attr({
     //cx: function(d){
-      //console.log(d[0]);
       //return d[1]*sin(d[0]);
     //},
     //cy: function(d){
