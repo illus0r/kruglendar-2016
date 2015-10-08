@@ -1,8 +1,12 @@
 body{
-	background-color: #BEEB9F;
 	text-align: center;
+  background-color: #BEEB9F;
+}
+svg{
+  background-color: #fff;
 }
 h1{
+  display: none;
 	margin-top: 1em;
 	color: #00A388;
 }
@@ -13,7 +17,8 @@ h1{
 	stroke-width: 0.5;
 }
 .circle{
-	fill: #FFFF9D;
+  display: none;
+	/*fill: #FFFF9D;*/
 }
 .date{
 	font-size: 2;

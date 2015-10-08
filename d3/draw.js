@@ -1,6 +1,6 @@
 //Changable variables
 //relative to size
-var svg_size = [500, 500],
+var svg_size = [2104.72, 2979.92],
     center = [0.5, 0.5];
 //abs
 //var gap = 0.1, // gap for new year
@@ -29,19 +29,10 @@ var pi = Math.PI;
 
 //processing some vars
 r *= (1-gap) // gap cause inner radius to be smaller
-var r2 = 0.18*r;// drawing point distance
+//var r2 = 0.18*r;// drawing point distance
+var r2 = 0.28*r;// drawing point distance
 var hypotrochoidAngleSpan = 2*pi*(1-gap);
 
-// extra
-var extra = {
-  label: {
-    text: "2016",
-    style: "text-anchor: middle; font-size: 10px;",
-    x: "0",
-    y: "-5px",
-  },
-  bottomText: {},
-};
 
 
 
@@ -268,6 +259,7 @@ function draw(){
     })
     .attr({
       x: 0,
+      fill: function(d){ if(d.weekend) { return "red"; } else{ return "black"; } },
       y: function(d){
         return -theta2ro(d.theta);
       },
@@ -276,8 +268,33 @@ function draw(){
         //var fontSize = fontSizeKoef * R * hypotrochoidAngleSpan / datesStringLength;
         var fontSize = fontSizeKoef * (R-r2) * hypotrochoidAngleSpan / datesStringLength;
         console.log("fontSize = " + fontSize);
-        return "font-size:"+ fontSize +"px; font-family:"+ fontFamily +";text-anchor:begin;font-weight:"+ fontWeight +";";
+        //decoration = (d.weekend)? "underline" : "none";
+        decoration = "none";
+        //weight = (d.weekend)? "normal" : "bold";
+        return "font-size:"+ fontSize +"px; "
+              +"font-family:"+ fontFamily +";"
+              +"text-anchor:begin;"
+              +"font-weight:"+ fontWeight +";"
+              //+"border-bottom: 3px solid black;"
+              +"text-decoration: "+ decoration +";";
       }
+    });
+
+  var svgExtra = svg.append("g")
+    .classed("extra", true);
+  svgExtra.append("text")
+    .text("Kruglendar")
+    .attr({
+      style: "text-anchor: middle;font-size: 16px; font-family:"+fontFamily+";",
+      x: svg_size[0]*(0.5),
+      y: svg_size[1]*(0.495)
+    }); 
+  svgExtra.append("text")
+    .text("2016")
+    .attr({
+      style: "text-anchor: middle;font-size: 40px; font-family:"+fontFamily+";",
+      x: svg_size[0]*(0.5),
+      y: svg_size[1]*(0.51)
     });
 
   // Test text string to get to know font-size for calendar
