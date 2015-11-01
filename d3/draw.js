@@ -12,10 +12,10 @@ var gap = 0.016, // gap for new year
 var date_font_size = 1*svg_size/500;
 //others
 var datesSpan = [new Date(2016, 0, 1), new Date(2016, 11, 31)];
+//var dateSeparator = "_"; // for Antonio
 //var fontFamily = "Sorren Ex SemiBold";
 //var fontFamily = "Antonio";
-//var dateSeparator = "_"; // for Antonio
-var fontFamily = "Varicka";
+//var fontFamily = "Varicka";
 //var fontFamily = "Higherup";
 //var fontFamily = "HFF Jammed Pack"; // unreadable
 //var fontFamily = "Xenophobia";
@@ -140,7 +140,7 @@ function draw(){
         .append("text")
         .attr({
           style: function(d){
-            return "font-size:1px; font-family:"+ fontFamily +";text-anchor:begin;font-weight:"+ fontWeight +";";
+            return "font-size:1px; text-anchor:begin;font-weight:"+ fontWeight +";";
           }
         })
         .text(datesString);
@@ -217,8 +217,8 @@ function draw(){
       return d.date;
     })
     .attr({
+      "class": function(d){ if(d.weekend) { return "weekend"; } else{ return "weekday"; } },
       x: 0,
-      fill: function(d){ if(d.weekend) { return "red"; } else{ return "black"; } },
       y: function(d){
         return -theta2ro(d.theta);
       },
@@ -230,7 +230,6 @@ function draw(){
         decoration = "none";
         //weight = (d.weekend)? "normal" : "bold";
         return "font-size:"+ fontSize +"px; "
-              +"font-family:"+ fontFamily +";"
               +"text-anchor:begin;"
               +"font-weight:"+ fontWeight +";"
               +"text-decoration: "+ decoration +";";

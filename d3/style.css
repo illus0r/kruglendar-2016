@@ -27,5 +27,16 @@ h1{
 	font-size: 2;
 }
 .date text{
+  /*font-family: "Sorren Ex SemiBold";*/
+  /*font-family: "Antonio";*/
+  /*font-family: "Higherup";*/
+  /*font-family: "HFF Jammed Pack";*/
+  /*font-family: "Xenophobia";*/
+  /*font-family: "Varicka";*/
+  /*should be declared in js to measure string display length*/
 	y: 2;
+}
+.date text.weekend{
+  /*fill: red;*/
+  font-weight: bold;
 }
