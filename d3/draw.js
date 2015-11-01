@@ -13,8 +13,8 @@ var date_font_size = 1*svg_size/500;
 //others
 var datesSpan = [new Date(2016, 0, 1), new Date(2016, 11, 31)];
 //var fontFamily = "Sorren Ex SemiBold";
-//var fontFamily = "Antonio";
 //var dateSeparator = "_"; // for Antonio
+//var fontFamily = "Antonio";
 var fontFamily = "Varicka";
 //var fontFamily = "Higherup";
 //var fontFamily = "HFF Jammed Pack"; // unreadable

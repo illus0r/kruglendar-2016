@@ -37,6 +37,6 @@ h1{
 	y: 2;
 }
 .date text.weekend{
-  /*fill: red;*/
-  font-weight: bold;
+  fill: red;
+  /*font-weight: bold;*/
 }
