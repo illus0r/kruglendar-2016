@@ -13,8 +13,15 @@ var date_font_size = 1*svg_size/500;
 //others
 var datesSpan = [new Date(2016, 0, 1), new Date(2016, 11, 31)];
 //var fontFamily = "Sorren Ex SemiBold";
-var fontFamily = "Antonio";
-var fontWeight = "Light";
+//var fontFamily = "Antonio";
+//var dateSeparator = "_"; // for Antonio
+var fontFamily = "Varicka";
+//var fontFamily = "Higherup";
+//var fontFamily = "HFF Jammed Pack"; // unreadable
+//var fontFamily = "Xenophobia";
+var dateSeparator = "-"; // for Varicka
+//var fontWeight = "Light";
+var fontWeight = "normal";
 //var fontFamily = "msam10";
 //font-family: 'Sorren Ex Bold'
 //font-family: 'Sorren Ex Medium'
@@ -139,7 +146,7 @@ function draw(){
         .text(datesString);
       var textTmpLength = textTmp.node().getComputedTextLength();
       d3.selectAll("svg.tmp").remove();
-      datesString += date.toString() + "_"; // TODO
+      datesString += date.toString() + dateSeparator; // TODO
       return {
         theta: textTmpLength, // will be converted to radians after this map is over
         date: date, 

@@ -10,6 +10,9 @@ h1{
 	margin-top: 1em;
 	color: #00A388;
 }
+.extra{
+  text-transform: uppercase;
+}
 .calendar-shape{
 	/*fill: #79BD8F;*/
 	fill: none;
