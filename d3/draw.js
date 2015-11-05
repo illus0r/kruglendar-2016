@@ -9,17 +9,17 @@ var gap = 0.016, // gap for new year
 	angle_newyear = 0,
 	R = 0.4*svg_size[0], // outer radius
 	r = R/12; // inner radius
-var date_font_size = 1*svg_size/500;
+var monthes_font_size = 1*svg_size[1]/150;
 //others
 var datesSpan = [new Date(2016, 0, 1), new Date(2016, 11, 31)];
 //var fontFamily = "Sorren Ex SemiBold";
-//var dateSeparator = "_"; // for Antonio
-//var fontFamily = "Antonio";
-var fontFamily = "Varicka";
+var dateSeparator = "-"; // for Antonio
+var fontFamily = "Antonio";
+//var fontFamily = "Varicka"; // TODO the best
+//var dateSeparator = "-"; // for Varicka
 //var fontFamily = "Higherup";
 //var fontFamily = "HFF Jammed Pack"; // unreadable
 //var fontFamily = "Xenophobia";
-var dateSeparator = "-"; // for Varicka
 //var fontWeight = "Light";
 var fontWeight = "normal";
 //var fontFamily = "msam10";
@@ -127,6 +127,7 @@ function draw(){
   var dateFormatDate = d3.time.format("%-d");
   var dateFormatDay = d3.time.format("%A");
   var dateFormatMonth = d3.time.format("%-m");
+  var dateFormatMonthName = d3.time.format("%B");
   var datesString = "";
   var dates = d3.time.scale()
     .domain(datesSpan)
@@ -152,6 +153,7 @@ function draw(){
         date: date, 
         weekend: (dateFormatDay(d) == "Saturday" || dateFormatDay(d) == "Sunday"), 
         month: dateFormatMonth(d),
+        monthName: dateFormatMonthName(d),
       };
     });
   //normalizing theta for every date
@@ -160,18 +162,34 @@ function draw(){
     d.theta = hypotrochoidAngleSpan * d.theta/datesStringLength;
   });
 
-  
-  monthesLength = d3.nest().key(function(d){
-    return d.month;
-  })
-  .entries(dates);
-
-
-  monthesLength.map(function(d){
-    d.values.map( function(v){
-      console.log("JSON = " + JSON.stringify(v));
-    });
+  var monthColors = [ [  0, 248, 193],
+                      [  0, 246, 0  ],
+                      [239, 194, 0  ],
+                      [255, 0, 0    ],
+                      [255, 0, 0    ],
+                      [255, 0, 0    ],
+                      [255, 0, 0    ],
+                      [255, 0, 0    ],
+                      [255, 0, 0    ],
+                      [255, 0, 210  ],
+                      [  0, 211, 255],
+                      [  0, 254, 255] ];
+  var previousLen = 0;
+  var monthes = d3.nest()
+  .key(function(d){ return d.month; })
+  .entries(dates)
+  .map(function(d){
+    var pLen = previousLen; //temp value
+    previousLen += d.values.length;
+    var rgb = monthColors.pop();
+    return {
+      monthName: d.values[0].monthName,
+      lenRelative: d.values.length / dates.length,
+      previousLenRelative: pLen / dates.length,
+      color: d3.rgb(rgb[0], rgb[1], rgb[2]).toString(),
+    }; 
   });
+  //console.log("monthes = " + JSON.stringify(monthes));
 
 
   // Drawing SVG
@@ -241,8 +259,51 @@ function draw(){
               +"font-family:"+ fontFamily +";"
               +"text-anchor:begin;"
               +"font-weight:"+ fontWeight +";"
+              +"fill:"+ "cyan" +";"
               +"text-decoration: "+ decoration +";";
       }
+    });
+
+  var arc = d3.svg.arc()
+    .innerRadius(R)
+    .outerRadius(R)
+    .startAngle(-pi/4)
+    .endAngle(pi/4);
+  //var monthesPath = text_monthes.append("circle")
+  var monthesPath = text_monthes.append("path")
+    .attr({
+      d: arc,
+      fill: "none",
+      stroke: "none",
+      id: "monthesPath"
+    });
+  var monthes_g = text_monthes.selectAll("g.month")
+    .data(monthes)
+    .enter()
+    .append("g")
+    .attr("transform", function(d){
+      var rotation =  (1-gap) * 2 * pi * ( d.lenRelative/2 + d.previousLenRelative ) * 180/pi;
+      return "rotate("+ rotation +")"; 
+    })
+    .classed("month", true)
+    .append("text")
+    .style({"font-size": monthes_font_size,
+            "letter-spacing": "0.1em",
+            "text-transform": "uppercase",
+            "text-anchor": "middle",
+    })
+    .append("textPath")
+    .attr({
+      "xlink:href": "#monthesPath",
+      startOffset: "25%",
+    })
+    .text(function(d){
+      return d.monthName;
+    })
+    .attr({
+      "class": function(d){ if(d.weekend) { return "weekend"; } else{ return "weekday"; } },
+      x: 0,
+      y: 0,
     });
 
   var svgExtra = svg.append("g")
