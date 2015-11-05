@@ -132,8 +132,8 @@ function draw(){
     .domain(datesSpan)
     .ticks(d3.time.days, 1)
     .map(function(d){
-      var date = dateFormatDate(d).toString() + ""; 
       // text object for measuring
+      var date = dateFormatDate(d).toString() + ""; 
       var textTmp = d3.select("body")
         .append("svg")
         .classed("tmp", true)
@@ -160,9 +160,18 @@ function draw(){
     d.theta = hypotrochoidAngleSpan * d.theta/datesStringLength;
   });
 
+  
+  monthesLength = d3.nest().key(function(d){
+    return d.month;
+  })
+  .entries(dates);
 
 
-
+  monthesLength.map(function(d){
+    d.values.map( function(v){
+      console.log("JSON = " + JSON.stringify(v));
+    });
+  });
 
 
   // Drawing SVG
@@ -225,7 +234,6 @@ function draw(){
       style: function(d){
         var fontSizeKoef = 1.0;
         var fontSize = fontSizeKoef * (R-r2) * hypotrochoidAngleSpan / datesStringLength;
-        console.log("fontSize = " + fontSize);
         //decoration = (d.weekend)? "underline" : "none";
         decoration = "none";
         //weight = (d.weekend)? "normal" : "bold";
