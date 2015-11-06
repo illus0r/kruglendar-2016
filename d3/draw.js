@@ -47,6 +47,7 @@ var hypotrochoidAngleSpan = 2*pi*(1-gap);
 
 // for hypotrochoid finds couple [theta, ro] for given psi (angle to rolling circle)
 // takes angle psi in radians
+// takes 
 // returns theta (angle to point) and ro (distance to point)
 //
 function psi2thetaRo(psi){
@@ -69,18 +70,18 @@ function psi2thetaRo(psi){
 // takes num and arr (sorted by theta!)
 // returns array index
 function closest (num, arr) {
-    var curr = arr[0];
-    var index = 0;
-    var diff = Math.abs (num - curr);
-    for (var val = 0; val < arr.length; val++) {
-        var newdiff = Math.abs (num - arr[val]);
-        if (newdiff < diff) {
-            diff = newdiff;
-            curr = arr[val];
-            index = val;
-        }
-    }
-    return index;
+  var curr = arr[0];
+  var index = 0;
+  var diff = Math.abs (num - curr);
+  for (var val = 0; val < arr.length; val++) {
+      var newdiff = Math.abs (num - arr[val]);
+      if (newdiff < diff) {
+        diff = newdiff;
+        curr = arr[val];
+        index = val;
+      }
+  }
+  return index;
 }
 
 // fill hypotrochoidArray with extra detailed ro(psi) hyportohoid data
@@ -117,8 +118,6 @@ function theta2ro(theta){ // TODO Ты неправильно работаешь
 
 
 function draw(){
-  
-
   // data in hypotrochoidArray is extradetailed now. 
   // We'll keep just 365 points we need
   var hypotrochoidArray = hypotrochoidArrayRaw;
@@ -162,18 +161,21 @@ function draw(){
     d.theta = hypotrochoidAngleSpan * d.theta/datesStringLength;
   });
 
-  var monthColors = [ [  0, 248, 193],
-                      [  0, 246, 0  ],
-                      [239, 194, 0  ],
-                      [255, 0, 0    ],
-                      [255, 0, 0    ],
-                      [255, 0, 0    ],
-                      [255, 0, 0    ],
-                      [255, 0, 0    ],
-                      [255, 0, 0    ],
-                      [255, 0, 210  ],
-                      [  0, 211, 255],
-                      [  0, 254, 255] ];
+  var rainbow = [ 
+    [  0, 248, 193],
+    [  0, 246, 0  ],
+    [239, 194, 0  ],
+    [255, 0, 0    ],
+    [255, 0, 210  ],
+    [  0, 211, 255],
+    [  0, 254, 255] ]
+    .map( function(rgb){
+      return d3.rgb(rgb[0], rgb[1], rgb[2]);
+    });
+  console.log("rainbow = " + rainbow);
+  var colorScale = d3.scale.linear()
+    .domain(d3.range(0, 1, 1.0 / (rainbow.length - 1)))
+    .range(rainbow);
   var previousLen = 0;
   var monthes = d3.nest()
   .key(function(d){ return d.month; })
@@ -181,15 +183,15 @@ function draw(){
   .map(function(d){
     var pLen = previousLen; //temp value
     previousLen += d.values.length;
-    var rgb = monthColors.pop();
+    var color = colorScale((pLen+d.values.length/2)/dates.length);
     return {
       monthName: d.values[0].monthName,
       lenRelative: d.values.length / dates.length,
       previousLenRelative: pLen / dates.length,
-      color: d3.rgb(rgb[0], rgb[1], rgb[2]).toString(),
+      color: color,
+      values: d.values,
     }; 
   });
-  //console.log("monthes = " + JSON.stringify(monthes));
 
 
   // Drawing SVG
@@ -225,51 +227,56 @@ function draw(){
       + ")"
       );
 
-  // Text objects
+
   var text_dates = calendar.append("g")
     .classed("text-dates", true);
-  var text_monthes = calendar.append("g")
-    .classed("text-monthes", true);
-  var date_g = text_dates.selectAll("g.date")
-    .data(dates)
-    .enter()
-    .append("g")
-    .attr("transform", function(d){
-      var rotation = d.theta * 180/pi;
-      return "rotate("+ rotation +")"; 
-    })
-    .classed("date", true)
-    .append("text")
-    .text(function(d){
-      return d.date;
-    })
-    .attr({
-      "class": function(d){ if(d.weekend) { return "weekend"; } else{ return "weekday"; } },
-      x: 0,
-      y: function(d){
-        return -theta2ro(d.theta);
-      },
-      style: function(d){
-        var fontSizeKoef = 1.0;
-        var fontSize = fontSizeKoef * (R-r2) * hypotrochoidAngleSpan / datesStringLength;
-        //decoration = (d.weekend)? "underline" : "none";
-        decoration = "none";
-        //weight = (d.weekend)? "normal" : "bold";
-        return "font-size:"+ fontSize +"px; "
-              +"font-family:"+ fontFamily +";"
-              +"text-anchor:begin;"
-              +"font-weight:"+ fontWeight +";"
-              +"fill:"+ "cyan" +";"
-              +"text-decoration: "+ decoration +";";
-      }
-    });
+  var month_g;
+  for (m of monthes){
+    month_g = text_dates
+      .append("g")
+      .classed(m.monthName, true);
+    var dates_g = month_g.selectAll("g.date")
+      .data(m.values)
+      .enter()
+      .append("g")
+      .attr("transform", function(d){
+        var rotation = d.theta * 180/pi;
+        return "rotate("+ rotation +")"; 
+      })
+      .classed("date", true)
+      .append("text")
+      .text(function(d){
+        return d.date;
+      })
+      .attr({
+        "class": function(d){ if(d.weekend) { return "weekend"; } else{ return "weekday"; } },
+        x: 0,
+        y: function(d){
+          return -theta2ro(d.theta);
+        },
+        style: function(d){
+          var fontSizeKoef = 1.0;
+          var fontSize = fontSizeKoef * (R-r2) * hypotrochoidAngleSpan / datesStringLength;
+          //decoration = (d.weekend)? "underline" : "none";
+          decoration = "none";
+          //weight = (d.weekend)? "normal" : "bold";
+          return "font-size:"+ fontSize +"px; "
+                +"font-family:"+ fontFamily +";"
+                +"text-anchor:begin;"
+                +"font-weight:"+ fontWeight +";"
+                +"fill:"+ m.color +";"
+                +"text-decoration: "+ decoration +";";
+        }
+      });
+  }
 
   var arc = d3.svg.arc()
     .innerRadius(R)
     .outerRadius(R)
     .startAngle(-pi/4)
     .endAngle(pi/4);
-  //var monthesPath = text_monthes.append("circle")
+  var text_monthes = calendar.append("g")
+    .classed("text-monthes", true);
   var monthesPath = text_monthes.append("path")
     .attr({
       d: arc,
@@ -290,6 +297,7 @@ function draw(){
     .style({"font-size": monthes_font_size,
             "letter-spacing": "0.1em",
             "text-transform": "uppercase",
+            "fill": function(d){return d.color;},
             "text-anchor": "middle",
     })
     .append("textPath")
