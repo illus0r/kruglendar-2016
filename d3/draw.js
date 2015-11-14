@@ -4,7 +4,7 @@ var svg_size = [2104.72, 2979.92],
     center = [0.5, 0.5];
 //abs
 //var gap = 0.1, // gap for new year
-var gap = 0.016, // gap for new year
+var gap = 0.01, // gap for new year
 //var gap = 1/10., // gap for new year
 	angle_newyear = 0,
 	R = 0.4*svg_size[0], // outer radius
@@ -12,16 +12,30 @@ var gap = 0.016, // gap for new year
 var monthes_font_size = 1*svg_size[1]/150;
 //others
 var datesSpan = [new Date(2016, 0, 1), new Date(2016, 11, 31)];
-//var fontFamily = "Sorren Ex SemiBold";
-var dateSeparator = "-"; // for Antonio
-var fontFamily = "Antonio";
+//var fontFamily = "Roboto Condensed Light";
+//var fontFamilyWeekend = "Roboto";
+//var fontFamily = "Antonio";
+var fontFamily = "Bebas Neue Thin";
+var fontFamily = "Bebas Neue Light";
+var fontFamily = "Bebas Neue Regular";
+var fontFamily = "Steelfish";
+//var fontFamily = "HFF Jammed Pack"; // unreadable
+var fontWeight = "normal";
+//var fontFamilyWeekend = "Arial Black";
+//var fontFamilyWeekend = "Impact";
+var fontFamilyWeekend = "Bebas Neue Bold";
+var fontFamilyWeekend = "Steelfish";
+var fontWeightWeekend = "900";
+//var fontFamily = "Sorren Ex Medium";
+//var fontWeight = "normal";
+//var fontFamilyWeekend = "Sorren Ex Bold";
+//var fontWeightWeekend = "normal";
+var dateSeparator = 0.0002*svg_size[0];
 //var fontFamily = "Varicka"; // TODO the best
 //var dateSeparator = "-"; // for Varicka
 //var fontFamily = "Higherup";
-//var fontFamily = "HFF Jammed Pack"; // unreadable
 //var fontFamily = "Xenophobia";
 //var fontWeight = "Light";
-var fontWeight = "normal";
 //var fontFamily = "msam10";
 //font-family: 'Sorren Ex Bold'
 //font-family: 'Sorren Ex Medium'
@@ -33,7 +47,8 @@ var pi = Math.PI;
 //processing some vars
 r *= (1-gap) // gap cause inner radius to be smaller
 //var r2 = 0.18*r;// drawing point distance
-var r2 = 0.28*r;// drawing point distance
+//var r2 = 0.28*r;// drawing point distance
+var r2 = 0.5*r;// drawing point distance
 var hypotrochoidAngleSpan = 2*pi*(1-gap);
 
 
@@ -87,7 +102,7 @@ function closest (num, arr) {
 // fill hypotrochoidArray with extra detailed ro(psi) hyportohoid data
 // and use it later for interpolation in ro(theta)
 // TODO not in the right place
-var hypotrochoidArrayRaw = d3.range(0.0001, hypotrochoidAngleSpan, 0.001).map(psi2thetaRo);
+var hypotrochoidArrayRaw = d3.range(0.0001, hypotrochoidAngleSpan, 0.0001).map(psi2thetaRo);
 
 // for hypotrochoid finds ro by theta (distance to point by angle)
 // uses ready array of hypotrochoid points hypotrochoidArrayRaw
@@ -100,6 +115,28 @@ function theta2ro(theta){ // TODO Ты неправильно работаешь
   return hypotrochoidArrayRaw[closestArrayItemIndex][1];
 }
 
+function pos2ro(pos){
+  var theta = pos * 2*pi * (1-gap) / 12;
+  return theta2ro(theta);
+}
+
+// we replace hypotrochoid with trochoid.
+// takes relative day in month position 
+// ex. first day of the month is 0, last one is 1, middle one is 0.5
+// returns ro (distance to point of hypotrochoid)
+//function trochoid(pos){
+  //if (pos > 0.5){
+    //pos = 1 - pos;
+  //}
+  //pos *= pi;
+  //// fooplot
+  //// 69.45*acos((69.45-s)/19.44)-19.44*sqrt(1-((69.45-s)/19.44)^2)
+  ////var y = r  * Math.acos( (r-pos)/r2 ) - //TODO this is greater than 1 sometimes
+          ////r2 * Math.sqrt( 1 - Math.pow( (r-pos)/r2 , 2 ) );
+  ////y /= 10;
+  //y = R-r2*1.8*Math.sin(pos);
+  //return y;
+//}
 
 
 
@@ -122,45 +159,6 @@ function draw(){
   // We'll keep just 365 points we need
   var hypotrochoidArray = hypotrochoidArrayRaw;
 
-  // date array
-  var dateFormatDate = d3.time.format("%-d");
-  var dateFormatDay = d3.time.format("%A");
-  var dateFormatMonth = d3.time.format("%-m");
-  var dateFormatMonthName = d3.time.format("%B");
-  var datesString = "";
-  var dates = d3.time.scale()
-    .domain(datesSpan)
-    .ticks(d3.time.days, 1)
-    .map(function(d){
-      // text object for measuring
-      var date = dateFormatDate(d).toString() + ""; 
-      var textTmp = d3.select("body")
-        .append("svg")
-        .classed("tmp", true)
-        .append("text")
-        .attr({
-          style: function(d){
-            return "font-size:1px; font-family:"+ fontFamily +";text-anchor:begin;font-weight:"+ fontWeight +";";
-          }
-        })
-        .text(datesString);
-      var textTmpLength = textTmp.node().getComputedTextLength();
-      d3.selectAll("svg.tmp").remove();
-      datesString += date.toString() + dateSeparator; // TODO
-      return {
-        theta: textTmpLength, // will be converted to radians after this map is over
-        date: date, 
-        weekend: (dateFormatDay(d) == "Saturday" || dateFormatDay(d) == "Sunday"), 
-        month: dateFormatMonth(d),
-        monthName: dateFormatMonthName(d),
-      };
-    });
-  //normalizing theta for every date
-  var datesStringLength = dates[dates.length-1].theta;
-  dates.map(function(d){
-    d.theta = hypotrochoidAngleSpan * d.theta/datesStringLength;
-  });
-
   var rainbow = [ 
     [  0, 248, 193],
     [  0, 246, 0  ],
@@ -172,10 +170,66 @@ function draw(){
     .map( function(rgb){
       return d3.rgb(rgb[0], rgb[1], rgb[2]);
     });
-  console.log("rainbow = " + rainbow);
   var colorScale = d3.scale.linear()
     .domain(d3.range(0, 1, 1.0 / (rainbow.length - 1)))
     .range(rainbow);
+
+  // date array
+  var dateFormatDate = d3.time.format("%-d");
+  var dateFormatDay = d3.time.format("%A");
+  var dateFormatMonth = d3.time.format("%-m");
+  var dateFormatMonthName = d3.time.format("%B");
+  var datesStringLength = 0;
+  var dates = d3.time.scale()
+    .domain(datesSpan)
+    .ticks(d3.time.days, 1)
+    .map(function(d){
+      // text object for measuring
+      d3.selectAll("svg.tmp").remove();
+      var dateString = dateFormatDate(d).toString(); 
+      //TODO
+      //dateString = (dateString=="5")?"ﬃ":"1";
+      var isWeekend = false;
+      if (dateFormatDay(d) == "Saturday" || dateFormatDay(d) == "Sunday"){
+        isWeekend = true;
+      } 
+      var fontFamilyCurrentDay = (isWeekend)?fontFamilyWeekend:fontFamily;
+      var fontWeightCurrentDay = (isWeekend)?fontWeightWeekend:fontWeight;
+      var textTmp = d3.select("body")
+        .append("svg")
+        .classed("tmp", true)
+        .append("text")
+        .attr({
+          x: 100,
+          y: 100,
+          style: function(d){
+            return "font-size:1px;"+ //should be 1px. Or we sould devide by this value later
+              "font-family:"+ fontFamilyCurrentDay +";"+
+              "font-weight:"+ fontWeightCurrentDay +";"+
+              "text-anchor:middle;"+
+              "";
+          }
+        })
+        .text(dateString);
+      var textTmpLength = textTmp.node().getComputedTextLength();
+      datesStringLength += textTmpLength + dateSeparator; // TODO
+      console.log("datesStringLength = " + datesStringLength);
+      return {
+        theta: datesStringLength, // will be converted to radians after this map is over
+        date: dateString, 
+        weekend: isWeekend, 
+        month: dateFormatMonth(d),
+        monthName: dateFormatMonthName(d),
+        color: "red", //tmp
+      };
+    });
+  //normalizing theta for every date
+  //var datesStringLength = dates[dates.length-1].theta;
+  dates.map(function(d){
+    d.theta = hypotrochoidAngleSpan * d.theta/datesStringLength;
+    d.color = colorScale(d.theta/hypotrochoidAngleSpan)
+  });
+
   var previousLen = 0;
   var monthes = d3.nest()
   .key(function(d){ return d.month; })
@@ -235,6 +289,42 @@ function draw(){
     month_g = text_dates
       .append("g")
       .classed(m.monthName, true);
+    var tBeg = m.values[0].theta;
+    var tEnd   = m.values[m.values.length-1].theta;
+
+    var colorScaleMonth = d3.scale.linear()
+      .domain([1,0])
+      .range ([m.values[0].color, m.values[m.values.length-1].color]);
+    m.values = m.values.map( function(d){
+      var t = d.theta;
+      d.color = colorScaleMonth((t-tBeg)/(tEnd-tBeg));
+      return d;
+    });
+  
+
+    ////debug
+    //var points_g = month_g.selectAll("g.point")
+      //.data(m.values)
+      //.enter()
+      //.append("g")
+      //.attr("transform", function(d){
+        //var rotation = d.theta * 180/pi;
+        //return "rotate("+ rotation +")"; 
+      //})
+      //.classed("point", true)
+      //.append("circle")
+      //.attr({
+        //cx: 0,
+        //cy: function(d){
+          //var tBeg = m.values[0].theta;
+          //var tEnd   = m.values[m.values.length-1].theta;
+          //var t = d.theta;
+          //return -pos2ro( (t-tBeg)/(tEnd-tBeg) );
+        //},
+        //r: 1,
+      //});
+    ////enddebug
+
     var dates_g = month_g.selectAll("g.date")
       .data(m.values)
       .enter()
@@ -252,22 +342,29 @@ function draw(){
         "class": function(d){ if(d.weekend) { return "weekend"; } else{ return "weekday"; } },
         x: 0,
         y: function(d){
-          return -theta2ro(d.theta);
+          var tBeg = m.values[0].theta;
+          var tEnd   = m.values[m.values.length-1].theta;
+          var t = d.theta;
+          return -pos2ro( (t-tBeg)/(tEnd-tBeg) );
         },
         style: function(d){
           var fontSizeKoef = 1.0;
           var fontSize = fontSizeKoef * (R-r2) * hypotrochoidAngleSpan / datesStringLength;
-          //decoration = (d.weekend)? "underline" : "none";
+          var fontFamilyCurrentDay = (d.weekend)?fontFamilyWeekend:fontFamily;
+          var fontWeightCurrentDay = (d.weekend)?fontWeightWeekend:fontWeight;
           decoration = "none";
+          //decoration = (d.weekend)? "underline" : "none";
           //weight = (d.weekend)? "normal" : "bold";
           return "font-size:"+ fontSize +"px; "
-                +"font-family:"+ fontFamily +";"
-                +"text-anchor:begin;"
-                +"font-weight:"+ fontWeight +";"
+                +"font-family:"+ fontFamilyCurrentDay +";"
+                +"text-anchor:end;"
+                +"font-weight:"+ fontWeightCurrentDay +";"
+                //+"fill:"+ d.color +";"
                 +"fill:"+ m.color +";"
                 +"text-decoration: "+ decoration +";";
         }
       });
+
   }
 
   var arc = d3.svg.arc()
@@ -319,7 +416,7 @@ function draw(){
   svgExtra.append("text")
     .text("Kruglendar")
     .attr({
-      style: "text-anchor: middle;font-size: 16px; font-family:"+fontFamily+";",
+      style: "text-anchor: middle;font-size: 14px; letter-spacing: 0.1em;",
       x: svg_size[0]*(0.5),
       y: svg_size[1]*(0.495)
     }); 
@@ -342,4 +439,4 @@ function draw(){
     //});
 }
 
-draw();
+//draw();
