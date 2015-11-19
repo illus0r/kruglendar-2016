@@ -39,6 +39,8 @@ var dateSeparator = 0.0002*svg_size[0];
 //var fontFamily = "msam10";
 //font-family: 'Sorren Ex Bold'
 //font-family: 'Sorren Ex Medium'
+var paddVer = 0.001*R;
+var paddHor = 0.002*R;
 
 //helpers
 var cos = Math.cos, sin = Math.sin;
@@ -185,7 +187,6 @@ function draw(){
     .ticks(d3.time.days, 1)
     .map(function(d){
       // text object for measuring
-      d3.selectAll("svg.tmp").remove();
       var dateString = dateFormatDate(d).toString(); 
       //TODO
       //dateString = (dateString=="5")?"ﬃ":"1";
@@ -213,7 +214,7 @@ function draw(){
         .text(dateString);
       var textTmpLength = textTmp.node().getComputedTextLength();
       datesStringLength += textTmpLength + dateSeparator; // TODO
-      console.log("datesStringLength = " + datesStringLength);
+      d3.selectAll("svg.tmp").remove();
       return {
         theta: datesStringLength, // will be converted to radians after this map is over
         date: dateString, 
@@ -329,41 +330,57 @@ function draw(){
       .data(m.values)
       .enter()
       .append("g")
-      .attr("transform", function(d){
-        var rotation = d.theta * 180/pi;
-        return "rotate("+ rotation +")"; 
+      .attr({
+        "transform": function(d){
+          var tBeg = m.values[0].theta;
+          var tEnd   = m.values[m.values.length-1].theta;
+          var t = d.theta;
+          var y = -pos2ro( (t-tBeg)/(tEnd-tBeg) );
+          var rotation = d.theta * 180/pi;
+          return "rotate("+ rotation +") translate(0,"+ y +")"; 
+        },
       })
-      .classed("date", true)
-      .append("text")
+      .classed("date", true);
+
+    dates_g.append("text")
       .text(function(d){
         return d.date;
       })
       .attr({
         "class": function(d){ if(d.weekend) { return "weekend"; } else{ return "weekday"; } },
-        x: 0,
-        y: function(d){
-          var tBeg = m.values[0].theta;
-          var tEnd   = m.values[m.values.length-1].theta;
-          var t = d.theta;
-          return -pos2ro( (t-tBeg)/(tEnd-tBeg) );
-        },
         style: function(d){
           var fontSizeKoef = 1.0;
           var fontSize = fontSizeKoef * (R-r2) * hypotrochoidAngleSpan / datesStringLength;
-          var fontFamilyCurrentDay = (d.weekend)?fontFamilyWeekend:fontFamily;
-          var fontWeightCurrentDay = (d.weekend)?fontWeightWeekend:fontWeight;
+          var fontFamilyCurDay = (d.weekend)?fontFamilyWeekend:fontFamily;
+          var fontWeightCurDay = (d.weekend)?fontWeightWeekend:fontWeight;
+          var fontColorCurDay = (d.weekend)?"white":m.color;
           decoration = "none";
           //decoration = (d.weekend)? "underline" : "none";
           //weight = (d.weekend)? "normal" : "bold";
           return "font-size:"+ fontSize +"px; "
-                +"font-family:"+ fontFamilyCurrentDay +";"
+                +"font-family:"+ fontFamilyCurDay +";"
                 +"text-anchor:end;"
-                +"font-weight:"+ fontWeightCurrentDay +";"
+                +"font-weight:"+ fontWeightCurDay +";"
                 //+"fill:"+ d.color +";"
-                +"fill:"+ m.color +";"
+                +"fill:"+ fontColorCurDay +";"
                 +"text-decoration: "+ decoration +";";
         }
       });
+
+    dates_g.filter(function(d){return d.weekend;}).insert("rect", "text")
+      .attr({
+        "fill": function(d){
+          c = d.color;
+          return c;
+        },
+      });
+    month_g.selectAll("rect")
+      .attr("x", function(d) {return this.parentNode.getBBox().x - paddHor;})
+      .attr("y", function(d) {return this.parentNode.getBBox().y - paddVer;})
+      .attr("width", function(d) {return this.parentNode.getBBox().width + 2*paddHor;})
+      .attr("height", function(d) {return this.parentNode.getBBox().height + 2*paddVer;});
+
+
 
   }
 
@@ -439,4 +456,4 @@ function draw(){
     //});
 }
 
-//draw();
+draw();
