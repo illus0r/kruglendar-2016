@@ -9,14 +9,13 @@ var gap = 0.0, // gap for new year
 	angle_newyear = 0,
 	R = 0.4*svg_size[0], // outer radius
 	r = R/12; // inner radius
-var monthes_font_size = 1*svg_size[1]/150;
 //others
 var datesSpan = [new Date(2016, 0, 1), new Date(2016, 11, 31)];
 //var fontFamily = "Roboto Condensed Light";
 //var fontFamilyWeekend = "Roboto";
 //var fontFamily = "Antonio";
-var fontFamily = "Bebas Neue Thin";
-var fontFamily = "Bebas Neue Light";
+//var fontFamily = "Bebas Neue Thin";
+//var fontFamily = "Bebas Neue Light";
 var fontFamily = "Bebas Neue Regular";
 var fontFamily = "Steelfish";
 //var fontFamily = "HFF Jammed Pack"; // unreadable
@@ -40,6 +39,9 @@ var dateSeparator = 0.0002*svg_size[0];
 //var fontFamily = "msam10";
 //font-family: 'Sorren Ex Bold'
 //font-family: 'Sorren Ex Medium'
+var fontFamilyMonth = "Bebas Neue Thin";
+var monthes_font_size = 2.5*svg_size[1]/150;
+
 var paddVer = 0.001*R;
 var paddHor = 0.003*R;
 
@@ -51,7 +53,7 @@ var pi = Math.PI;
 r *= (1-gap) // gap cause inner radius to be smaller
 //var r2 = 0.18*r;// drawing point distance
 //var r2 = 0.28*r;// drawing point distance
-var r2 = 0.5*r;// drawing point distance
+var r2 = 0.3*r;// drawing point distance
 var hypotrochoidAngleSpan = 2*pi*(1-gap);
 
 
@@ -366,7 +368,8 @@ function draw(){
           //var fontSize = fontSizeKoef * (R-r2) * hypotrochoidAngleSpan / datesStringLength;
           var fontFamilyCurDay = (d.weekend)?fontFamilyWeekend:fontFamily;
           var fontWeightCurDay = (d.weekend)?fontWeightWeekend:fontWeight;
-          var fontColorCurDay = (d.weekend)?"white":m.color;
+          //var fontColorCurDay = (d.weekend)?"white":m.color;
+          var fontColorCurDay = m.color;
           decoration = "none";
           //decoration = (d.weekend)? "underline" : "none";
           //weight = (d.weekend)? "normal" : "bold";
@@ -380,28 +383,18 @@ function draw(){
         }
       });
 
-    dates_g.filter(function(d){return d.weekend;}).insert("rect", "text")
-      .attr({
-        "fill": function(d){return m.color;},
-        "paddHor": function(d){
-          //var tBeg = m.values[0].theta;
-          //var tEnd   = m.values[m.values.length-1].theta;
-          //var t = d.theta;
-          //var transitionY = -pos2ro( (t-tBeg)/(tEnd-tBeg) );
-          //console.log("paddHor*transitionY/R; = " + paddHor*transitionY/R);
-          return paddHor;//*transitionY/R;
-        },
-      });
-    //var tBeg = m.values[0].theta;
-    //var tEnd   = m.values[m.values.length-1].theta;
-    //var t = d.theta;
-    //var transitionY = -pos2ro( (t-tBeg)/(tEnd-tBeg) );
-    //var rotation = d.theta * 180/pi;
-    month_g.selectAll("rect")
-      .attr("x", function(d) {return this.parentNode.getBBox().x - paddHor;})
-      .attr("y", function(d) {return this.parentNode.getBBox().y - paddVer;})
-      .attr("width", function(d) {return this.parentNode.getBBox().width + 2*paddHor;})
-      .attr("height", function(d) {return this.parentNode.getBBox().height + 2*paddVer;});
+    //dates_g.filter(function(d){return d.weekend;}).insert("rect", "text")
+      //.attr({
+        //"fill": function(d){return m.color;},
+        //"paddHor": function(d){
+          //return paddHor;/[>transitionY/R;
+        //},
+      //});
+    //month_g.selectAll("rect")
+      //.attr("x", function(d) {return this.parentNode.getBBox().x - paddHor;})
+      //.attr("y", function(d) {return this.parentNode.getBBox().y - paddVer;})
+      //.attr("width", function(d) {return this.parentNode.getBBox().width + 2*paddHor;})
+      //.attr("height", function(d) {return this.parentNode.getBBox().height + 2*paddVer;});
 
 
 
@@ -433,6 +426,7 @@ function draw(){
     .append("text")
     .style({"font-size": monthes_font_size,
             "letter-spacing": "0.1em",
+            "font-family": fontFamilyMonth,
             "text-transform": "uppercase",
             "fill": function(d){return d.color;},
             "text-anchor": "middle",
@@ -451,31 +445,34 @@ function draw(){
       y: 0,
     });
 
-  var svgExtra = svg.append("g")
-    .classed("extra", true);
+  var svgExtra = calendar.append("g")
+    .classed("extra", true)
+    .style({
+      transform: "translate(0) scale(0.4)",
+    });
   svgExtra.append("text")
     .text("Kruglendar")
     .attr({
-      style: "text-anchor: middle;font-size: 14px; letter-spacing: 0.1em;",
-      x: svg_size[0]*(0.5),
-      y: svg_size[1]*(0.495)
+      x: 0,
+      y: 60,
+      style: "text-anchor: middle;font-size: 40px; letter-spacing: 0.1em; font-family:'Bebas Neue Regular';",
     }); 
   svgExtra.append("text")
     .text("2016")
     .attr({
-      style: "text-anchor: middle;font-size: 40px; font-family:"+fontFamily+";",
-      x: svg_size[0]*(0.5),
-      y: svg_size[1]*(0.51)
+      x: 0,
+      y: 0,
+      style: "text-anchor: middle;font-size: 140px; font-family:'Bebas Neue Regular';",
     });
 
-  //// Draw hypotrochoid path
+  //// Draw hypotrochoid path (regualr month length)
   //var line = d3.svg.line();
   //var hypotrochoidRaw = calendar.append("path")
     //.classed("calendar-shape", true)
     //.attr({
       //d: line(hypotrochoidArrayRaw.map(function(d){return [d[1]*sin(d[0]), d[1]*cos(d[0])]})),
       //id: "hypotrochoidRaw",
-      //style: "opacity: 0.09; stroke-width: 5px;"
+      //style: "opacity: 0.9; stroke-width: 1px;"
     //});
 }
 
