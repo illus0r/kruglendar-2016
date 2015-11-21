@@ -4,7 +4,7 @@ var svg_size = [2104.72, 2979.92],
     center = [0.5, 0.5];
 //abs
 //var gap = 0.1, // gap for new year
-var gap = 0.01, // gap for new year
+var gap = 0.0, // gap for new year
 //var gap = 1/10., // gap for new year
 	angle_newyear = 0,
 	R = 0.4*svg_size[0], // outer radius
@@ -26,6 +26,7 @@ var fontWeight = "normal";
 var fontFamilyWeekend = "Bebas Neue Bold";
 var fontFamilyWeekend = "Steelfish";
 var fontWeightWeekend = "900";
+var fontScaleWeekend = 1.5;
 //var fontFamily = "Sorren Ex Medium";
 //var fontWeight = "normal";
 //var fontFamilyWeekend = "Sorren Ex Bold";
@@ -40,7 +41,7 @@ var dateSeparator = 0.0002*svg_size[0];
 //font-family: 'Sorren Ex Bold'
 //font-family: 'Sorren Ex Medium'
 var paddVer = 0.001*R;
-var paddHor = 0.002*R;
+var paddHor = 0.003*R;
 
 //helpers
 var cos = Math.cos, sin = Math.sin;
@@ -204,7 +205,9 @@ function draw(){
           x: 100,
           y: 100,
           style: function(d){
-            return "font-size:1px;"+ //should be 1px. Or we sould devide by this value later
+            var scale = (isWeekend)?fontScaleWeekend:1;
+            return "font-size:"+scale+"px;"+
+            //return "font-size:"+1+"px;"+ //should be 1px. Or we sould devide by this value later
               "font-family:"+ fontFamilyCurrentDay +";"+
               "font-weight:"+ fontWeightCurrentDay +";"+
               "text-anchor:middle;"+
@@ -213,9 +216,18 @@ function draw(){
         })
         .text(dateString);
       var textTmpLength = textTmp.node().getComputedTextLength();
-      datesStringLength += textTmpLength + dateSeparator; // TODO
+      //if(isWeekend){
+        //console.log("we textTmpLength = " + textTmpLength);
+      //}
+      //else{
+        //console.log("textTmpLength = " + textTmpLength);
+      //}
+
+      datesStringLength += textTmpLength + dateSeparator;
       d3.selectAll("svg.tmp").remove();
       return {
+        scale: (isWeekend)?fontScaleWeekend:1,
+        //scale: 1,
         theta: datesStringLength, // will be converted to radians after this map is over
         date: dateString, 
         weekend: isWeekend, 
@@ -294,7 +306,7 @@ function draw(){
     var tEnd   = m.values[m.values.length-1].theta;
 
     var colorScaleMonth = d3.scale.linear()
-      .domain([1,0])
+      .domain([0,1])
       .range ([m.values[0].color, m.values[m.values.length-1].color]);
     m.values = m.values.map( function(d){
       var t = d.theta;
@@ -335,9 +347,9 @@ function draw(){
           var tBeg = m.values[0].theta;
           var tEnd   = m.values[m.values.length-1].theta;
           var t = d.theta;
-          var y = -pos2ro( (t-tBeg)/(tEnd-tBeg) );
+          var transitionY = -pos2ro( (t-tBeg)/(tEnd-tBeg) );
           var rotation = d.theta * 180/pi;
-          return "rotate("+ rotation +") translate(0,"+ y +")"; 
+          return "rotate("+ rotation +") translate(0,"+ transitionY +")"; 
         },
       })
       .classed("date", true);
@@ -350,7 +362,8 @@ function draw(){
         "class": function(d){ if(d.weekend) { return "weekend"; } else{ return "weekday"; } },
         style: function(d){
           var fontSizeKoef = 1.0;
-          var fontSize = fontSizeKoef * (R-r2) * hypotrochoidAngleSpan / datesStringLength;
+          var fontSize = fontSizeKoef * d.scale * (R-r2) * hypotrochoidAngleSpan / datesStringLength;
+          //var fontSize = fontSizeKoef * (R-r2) * hypotrochoidAngleSpan / datesStringLength;
           var fontFamilyCurDay = (d.weekend)?fontFamilyWeekend:fontFamily;
           var fontWeightCurDay = (d.weekend)?fontWeightWeekend:fontWeight;
           var fontColorCurDay = (d.weekend)?"white":m.color;
@@ -369,11 +382,21 @@ function draw(){
 
     dates_g.filter(function(d){return d.weekend;}).insert("rect", "text")
       .attr({
-        "fill": function(d){
-          c = d.color;
-          return c;
+        "fill": function(d){return m.color;},
+        "paddHor": function(d){
+          //var tBeg = m.values[0].theta;
+          //var tEnd   = m.values[m.values.length-1].theta;
+          //var t = d.theta;
+          //var transitionY = -pos2ro( (t-tBeg)/(tEnd-tBeg) );
+          //console.log("paddHor*transitionY/R; = " + paddHor*transitionY/R);
+          return paddHor;//*transitionY/R;
         },
       });
+    //var tBeg = m.values[0].theta;
+    //var tEnd   = m.values[m.values.length-1].theta;
+    //var t = d.theta;
+    //var transitionY = -pos2ro( (t-tBeg)/(tEnd-tBeg) );
+    //var rotation = d.theta * 180/pi;
     month_g.selectAll("rect")
       .attr("x", function(d) {return this.parentNode.getBBox().x - paddHor;})
       .attr("y", function(d) {return this.parentNode.getBBox().y - paddVer;})
