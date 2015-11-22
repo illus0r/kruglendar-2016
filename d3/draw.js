@@ -31,8 +31,7 @@ var fontScaleWeekend = 1.5;
 //var fontFamilyWeekend = "Sorren Ex Bold";
 //var fontWeightWeekend = "normal";
 var dateSeparator = 0.0002*svg_size[0];
-//var fontFamily = "Varicka"; // TODO the best
-//var dateSeparator = "-"; // for Varicka
+//var fontFamily = "Varicka";
 //var fontFamily = "Higherup";
 //var fontFamily = "Xenophobia";
 //var fontWeight = "Light";
@@ -165,18 +164,36 @@ function draw(){
   var hypotrochoidArray = hypotrochoidArrayRaw;
 
   var rainbow = [ 
-    [  0, 248, 193],
-    [  0, 246, 0  ],
-    [239, 194, 0  ],
-    [255, 0, 0    ],
-    [255, 0, 210  ],
-    [  0, 211, 255],
-    [  0, 254, 255] ]
+    [0.178,227],
+    //[5,167,170],
+    [9,162,95],
+    [133,198,70],
+    [254,232,11],
+    [237,130,26],
+    [234,27,33],
+    [235,25,74],
+    [239,6,134],
+    [133,41,140],
+    [14,77,156],
+    [1,149,213],
+    [0.178,227],
+    ]
+    //[  0, 248, 193],
+    //[  0, 246, 0  ],
+    //[239, 194, 0  ],
+    //[255, 0, 0    ],
+    //[255, 0, 210  ],
+    //[  0, 211, 255],
+    //[  0, 254, 255] ]
     .map( function(rgb){
       return d3.rgb(rgb[0], rgb[1], rgb[2]);
     });
   var colorScale = d3.scale.linear()
-    .domain(d3.range(0, 1, 1.0 / (rainbow.length - 1)))
+    .domain(d3.range(0, 1.0, 1.0 / (rainbow.length-1)))
+    //.domain([ 0, 0.166, 0.333, 0.5, 0.666, 0.833 ])
+    //.domain([ 0, 0.166, 0.233, 0.5, 0.666, 0.833 ])
+    //.domain([ 0, 0.2, 0.3, 0.4, 0.6, 0.8, 1])
+    //.domain([0, 0.2, 0.4, 0.6, 0.8, 1])
     .range(rainbow);
 
   // date array
@@ -275,14 +292,14 @@ function draw(){
       width: svg_size[0],
       height: svg_size[1]	
     });
-  // Helper circle
-  svg.append("circle")
-    .attr({
-      cx: svg_size[0]*center[0],
-      cy: svg_size[1]*center[1],
-      r: R
-    })
-    .classed("circle", true);
+  //// Helper circle
+  //svg.append("circle")
+    //.attr({
+      //cx: svg_size[0]*center[0],
+      //cy: svg_size[1]*center[1],
+      //r: R
+    //})
+    //.classed("circle", true);
   // Whole calender will be stored in this var
   var calendar = svg.append("g")
     .attr("transform", 
