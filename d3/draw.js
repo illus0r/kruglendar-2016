@@ -323,6 +323,9 @@ function draw(){
       .classed(m.monthName, true);
     var tBeg = m.values[0].theta;
     var tEnd   = m.values[m.values.length-1].theta;
+    var roPrev = -(R-r+r2);
+    //console.log("reset");
+    var thetaPrev = 0;
 
     var colorScaleMonth = d3.scale.linear()
       .domain([0,1])
@@ -379,6 +382,18 @@ function draw(){
       })
       .attr({
         "class": function(d){ if(d.weekend) { return "weekend"; } else{ return "weekday"; } },
+        "transform": function(d){ 
+          var t = d.theta;
+          roCurr = - pos2ro((t-tBeg)/(tEnd-tBeg)) 
+          //console.log("roCurr = " + roCurr);
+          //console.log("R = " + (R-r+r2));
+          var dy = roCurr - roPrev; 
+          var dx = R*(d.theta - thetaPrev); 
+          thetaPrev = d.theta;
+          roPrev = roCurr;
+          //console.log("skewY = " + Math.atan(dy/dx)*180/pi);
+          return "skewY("+Math.atan(dy/dx)*180/pi+")"; 
+        },
         style: function(d){
           var fontSizeKoef = 1.0;
           var fontSize = fontSizeKoef * d.scale * (R-r2) * hypotrochoidAngleSpan / datesStringLength;
