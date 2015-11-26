@@ -1,7 +1,7 @@
 Kruglendar 2016
 ===
-> Sketch the year.  
-Sketch past to keep moments. Sketch future to keep moving.
+> Draw the year.  
+Draw past to keep moments. Draw future to keep moving.
 
 DIY tips
 ---
