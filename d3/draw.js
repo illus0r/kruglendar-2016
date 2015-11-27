@@ -4,7 +4,7 @@ var svg_size = [2104.72, 2979.92],
     center = [0.5, 0.5];
 //abs
 //var gap = 0.1, // gap for new year
-var gap = 0.0, // gap for new year
+var gap = 0.01, // gap for new year
 //var gap = 1/10., // gap for new year
 	angle_newyear = 0,
 	R = 0.4*svg_size[0], // outer radius
@@ -16,14 +16,14 @@ var datesSpan = [new Date(2016, 0, 1), new Date(2016, 11, 31)];
 //var fontFamily = "Antonio";
 //var fontFamily = "Bebas Neue Thin";
 //var fontFamily = "Bebas Neue Light";
-var fontFamily = "Bebas Neue Regular";
-var fontFamily = "Steelfish";
+//var fontFamily = "Steelfish";
 //var fontFamily = "HFF Jammed Pack"; // unreadable
+var fontFamily = "Bebas Neue";
 var fontWeight = "normal";
 //var fontFamilyWeekend = "Arial Black";
 //var fontFamilyWeekend = "Impact";
-var fontFamilyWeekend = "Bebas Neue Bold";
-var fontFamilyWeekend = "Steelfish";
+//var fontFamilyWeekend = "Steelfish";
+var fontFamilyWeekend = "Bebas Neue";
 var fontWeightWeekend = "900";
 var fontScaleWeekend = 1.5;
 //var fontFamily = "Sorren Ex Medium";
@@ -39,6 +39,7 @@ var dateSeparator = 0.0002*svg_size[0];
 //font-family: 'Sorren Ex Bold'
 //font-family: 'Sorren Ex Medium'
 var fontFamilyMonth = "Bebas Neue Thin";
+var fontFamilyMonthWeight = 100;
 var monthes_font_size = 2.5*svg_size[1]/150;
 
 var paddVer = 0.001*R;
@@ -164,9 +165,10 @@ function draw(){
   var hypotrochoidArray = hypotrochoidArrayRaw;
 
   var rainbow = [ 
+    [1,149,213],
     [0.178,227],
     //[5,167,170],
-    [9,162,95],
+    //[9,162,95],
     [133,198,70],
     [254,232,11],
     [237,130,26],
@@ -176,7 +178,6 @@ function draw(){
     [133,41,140],
     [14,77,156],
     [1,149,213],
-    [0.178,227],
     ]
     //[  0, 248, 193],
     //[  0, 246, 0  ],
@@ -191,12 +192,14 @@ function draw(){
   //console.log("hello");
   //console.log(0, 1.0, 1.0 / (rainbow.length-1));
   var colorScale = d3.scale.linear()
-    .domain(d3.range(0, 1.0, 1.0 / (rainbow.length-1)))
+    //.domain(d3.range(0, 1.0, 1.0 / (rainbow.length-1)))
+    .domain([0, 0.09, 0.18, 0.36, 0.45, 0.54, 0.63, 0.72, 0.81, 0.90, 1])
     //.domain([ 0, 0.166, 0.333, 0.5, 0.666, 0.833, 1])
     //.domain([ 0, 0.166, 0.233, 0.5, 0.666, 0.833 ])
     //.domain([ 0, 0.2, 0.3, 0.4, 0.6, 0.8, 1])
     //.domain([0, 0.2, 0.4, 0.6, 0.8, 1])
     .range(rainbow);
+  //console.log("rainbow = " + JSON.stringify(d3.range(0, 1.0, 1.0 / (rainbow.length-1))));
 
   // date array
   var dateFormatDate = d3.time.format("%-d");
@@ -265,6 +268,20 @@ function draw(){
   });
 
   var previousLen = 0;
+  monthKerning = [
+    "0 0 0 1.55 -0.85000008 0 -2.4299998",
+    "0 0 0 0 0 -0.95000011 -0.54999995 -0.98999995",
+    "",
+    "0 0 0 2.1899998 2.1399999",
+    "0 0 -4.4199996",
+    "",
+    "0 1.7300001 1.1800001 -8.46",
+    "0 0 0 0 0 -2.5899997",
+    "0 0 0 -3.1299989 -1.4000001 1.2 1.2299999",
+    "0 0 -2.0999999 -3.4299994",
+    "0 0 -2.1399999 -1.42 -0.75000006 1",
+    "0 0 -1.42 -1.2900001 0 1.33"
+    ];
   var monthes = d3.nest()
   .key(function(d){ return d.month; })
   .entries(dates)
@@ -278,6 +295,7 @@ function draw(){
       previousLenRelative: pLen / dates.length,
       color: color,
       values: d.values,
+      dx: monthKerning.shift(),
     }; 
   });
 
@@ -387,19 +405,16 @@ function draw(){
         "transform": function(d){ 
           var t = d.theta;
           roCurr = - pos2ro((t-tBeg)/(tEnd-tBeg)) 
-          //console.log("roCurr = " + roCurr);
-          //console.log("R = " + (R-r+r2));
           var dy = roCurr - roPrev; 
           var dx = R*(d.theta - thetaPrev); 
           thetaPrev = d.theta;
           roPrev = roCurr;
-          //console.log("skewY = " + Math.atan(dy/dx)*180/pi);
-          return "skewY("+Math.atan(dy/dx)*180/pi+")"; 
+          return "skewY("+Math.atan(dy/dx)*180/pi*1.2+")"; 
+          //1.2 is a hack
         },
         style: function(d){
           var fontSizeKoef = 1.0;
           var fontSize = fontSizeKoef * d.scale * (R-r2) * hypotrochoidAngleSpan / datesStringLength;
-          //var fontSize = fontSizeKoef * (R-r2) * hypotrochoidAngleSpan / datesStringLength;
           var fontFamilyCurDay = (d.weekend)?fontFamilyWeekend:fontFamily;
           var fontWeightCurDay = (d.weekend)?fontWeightWeekend:fontWeight;
           //var fontColorCurDay = (d.weekend)?"white":m.color;
@@ -459,11 +474,15 @@ function draw(){
     .classed("month", true)
     .append("text")
     .style({"font-size": monthes_font_size,
-            "letter-spacing": "0.1em",
+            "letter-spacing": "5px",
             "font-family": fontFamilyMonth,
+            "font-weight": fontFamilyMonthWeight,
             "text-transform": "uppercase",
             "fill": function(d){return d.color;},
             "text-anchor": "middle",
+    })
+    .attr({
+            "dx": function(d){return d.dx;},
     })
     .append("textPath")
     .attr({
@@ -479,25 +498,61 @@ function draw(){
       y: 0,
     });
 
-  var svgExtra = calendar.append("g")
+  var svgExtra = svg.append("g")
     .classed("extra", true)
-    .style({
-      transform: "translate(0) scale(0.4)",
+    .attr({
+      transform: "translate("
+      + svg_size[0]*center[0] 
+      + "," 
+      + svg_size[1]*center[1]
+      + ")",
     });
-  svgExtra.append("text")
+  var extraLabel = svgExtra.append("g")
+    .attr({
+      transform: "translate(0 10) scale(0.4)",
+    });
+    
+  extraLabel.append("text")
     .text("Kruglendar")
     .attr({
       x: 0,
       y: 60,
-      style: "text-anchor: middle;font-size: 40px; letter-spacing: 0.1em; font-family:'Bebas Neue Regular';",
+      style: "text-anchor: middle;font-size: 40px; letter-spacing: 5.4px; font-family:'Bebas Neue';",
     }); 
-  svgExtra.append("text")
-    .text("2016")
+  extraLabel.append("text")
     .attr({
-      x: 0,
-      y: 0,
-      style: "text-anchor: middle;font-size: 140px; font-family:'Bebas Neue Regular';",
+      x: "0.017473536",
+      y: "0.48287916",
+      style: "font-size:127px;text-anchor:middle;font-family:Bebas Neue; font-weight: bold;",
+      dx: "-1.0802984 5.6619849 -2.1156566 4.49368",
+    })
+  .text("2016");
+
+  var tree = svgExtra.append("g")
+    .classed("tree",true)
+    .attr({
+      transform: "translate(4 "+ -807 +") scale(3)",
     });
+    tree.append("path")
+      .attr({
+        d: "m -1.9061626,0.6282 1.92250002,-1.9187 1.91874998,1.9187 -3.84125,0 z",
+        fill: rainbow[0],
+      });
+    tree.append("path")
+      .attr({
+        d: "m -2.3516626,2.3756 2.36875002,-2.3663 2.36374998,2.3663 -4.7325,0 z",
+        fill: rainbow[0],
+      });
+    tree.append("path")
+      .attr({
+        d: "m -2.7966626,4.1231 2.81250002,-2.8125 2.81124998,2.8125 -5.62375,0 z",
+        fill: rainbow[0],
+      });
+    tree.append("path")
+      .attr({
+        d: "m 0.01539742,-3.3436 0.28055,0.7187 0.77022998,0.045 -0.59682998,0.4889 0.19547,0.7463 -0.64942,-0.4165 -0.64942,0.4165 0.19547,-0.7463 -0.59683002,-0.4889 0.77022002,-0.045 z",
+        style: "fill:#ff1919;",
+      });
 
   //// Draw hypotrochoid path (regualr month length)
   //var line = d3.svg.line();
