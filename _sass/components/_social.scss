@@ -1,0 +1,21 @@
+/*social share fix*/
+.social p{
+  display: inline;
+}
+#vkshare0 a, #vkshare0 a #vkshare_cnt0 {
+    /*height: 20px !important;*/
+}
+#vkshare0 {
+    margin-bottom: 4px;
+    td{
+      padding: 0;
+    }
+}
+#u_0_3{
+    display: none;
+}
+#vkshare0, #twitter-widget-0, .PIN_1419232687627_pin_it_button_20, .pinterest-wrapper, .g-plus{
+    vertical-align: top;
+    display: inline-block;
+    margin-right: 4px;
+}

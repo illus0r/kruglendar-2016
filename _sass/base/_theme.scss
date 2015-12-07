@@ -1,0 +1,32 @@
+body{
+  /*background: #000;*/
+  position: relative;
+  &>.wrapper{
+    /*bottom: 0;*/
+    /*left: 0;*/
+    overflow: hidden;
+    /*position: absolute;*/
+    /*right: 0;*/
+    /*top: 0;*/
+    &:after{
+      $kruglendar-size: 2000px;
+      background: url(../img/krug.svg);
+      content: ' ';
+      display: block;
+      height: $kruglendar-size;
+      left: 50%;
+      margin-left: -$kruglendar-size / 2;
+      position: absolute;
+      top: 0;
+      transform-origin:center center;
+      width: $kruglendar-size;
+      z-index: -1;
+      animation: spin1 300s infinite linear;
+    }
+  }
+}
+
+@keyframes spin1 {
+  0% { transform: rotate(360deg);}
+  100% { transform: rotate(0deg); }
+}

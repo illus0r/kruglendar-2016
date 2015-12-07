@@ -1,0 +1,48 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:300,400,700);
+@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400,700);
+
+body{
+  font-family: $font-family;
+  font-weight: 300;
+  font-size: $font-size;
+  *{
+    line-height: 1.5em;
+  }
+}
+
+$header-scale: 1.414;
+h1{ font-size: $font-size * $header-scale * $header-scale * $header-scale; }
+h2{ font-size: $font-size * $header-scale * $header-scale; }
+h3{ font-size: $font-size * $header-scale; }
+h4{ font-size: $font-size; }
+h1,h2,h3,h4{
+  font-weight: bold;
+  line-height: 1.2em;
+  /*font-family: $font-family-condensed;*/
+}
+p{
+  &.description{ 
+    font-size: $font-size * $header-scale * $header-scale;
+  }
+}
+
+ol, ul{
+  font-size: 0.8em;
+}
+ul{
+  li{
+    &:before{
+      @extend .star;
+      content: " ";
+      display: inline-block;
+      height: 1em;
+      padding-left: 0.3em;
+      width: 1em;
+    }
+  }
+}
+
+ol{
+  list-style: decimal;
+  margin: 0.8em 1.4em;
+}

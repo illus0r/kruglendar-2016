@@ -4,9 +4,15 @@
 @charset "utf-8";
 
 // Import partials from `sass_dir` (defaults to `_sass`)
+
 @import
+        "../bower_components/meyer-reset/_meyer-reset.scss",
         "base/vars",
-        "../bower_components/Materialize/sass/materialize.scss",
+        "base/layout",
         "base/typo",
-        "base/old"
+        "base/theme",
+        "pages/2016",
+        "components/social",
+        "components/button",
+        "helpers/mixins"
 ;

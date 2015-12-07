@@ -1,0 +1,19 @@
+.star{
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="m 10.0101,0.66179572 2.6726,6.84659998 7.3375,0.429 -5.6856,4.6575003 1.8621,7.109501 L 10.0101,15.736496 3.8235,19.704397 5.6856,12.594896 0,7.9373957 l 7.3374,-0.429 z" style="fill:#ff1919" /> </svg>');
+	background-repeat: no-repeat;
+}
+
+@function pow($number, $exp) {
+  $value: 1;
+  @if $exp > 0 {
+    @for $i from 1 through $exp {
+      $value: $value * $number;
+    }
+  }
+  @else if $exp < 0 {
+    @for $i from 1 through -$exp {
+      $value: $value / $number;
+    }
+  }
+  @return $value;
+}

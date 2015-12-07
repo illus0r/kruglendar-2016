@@ -1,0 +1,18 @@
+{
+  "name": "meyer-reset",
+  "description": "Eric Meyer CSS reset in Sass",
+  "version": "1.0.0",
+  "homepage": "https://github.com/andysolomon/meyer-reset",
+  "authors": [
+    "Andrew Solomon <andrewsolomon.edu@gmail.com>"
+  ],
+  "main": "meyer-reset.scss",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
