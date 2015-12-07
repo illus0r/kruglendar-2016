@@ -21,8 +21,10 @@ h1,h2,h3,h4{
   /*font-family: $font-family-condensed;*/
 }
 p{
+  margin: 0.5em 0;
   &.description{ 
     font-size: $font-size * $header-scale * $header-scale;
+    margin: 0;
   }
 }
 
@@ -30,6 +32,7 @@ ol, ul{
   font-size: 0.8em;
 }
 ul{
+  margin: 0.8em 0;
   li{
     &:before{
       @extend .star;
