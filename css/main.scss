@@ -5,6 +5,8 @@
 
 // Import partials from `sass_dir` (defaults to `_sass`)
 @import
+        "base/vars",
         "../bower_components/Materialize/sass/materialize.scss",
+        "base/typo",
         "base/old"
 ;
