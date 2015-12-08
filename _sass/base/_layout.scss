@@ -1,6 +1,9 @@
+html, body{
+  /*height: 100%;*/
+}
 .container{
   background: white;
-  margin: 360px auto;
+  margin: 360px auto 0;
   width: $container-width;
   box-sizing: border-box;
   padding: 0 40px 40px;
