@@ -35,8 +35,10 @@ title: Круглендарь 2016
 Буду благодарен, если расскажете о проекте друзьям:
 <br>
 {% include social.html %}
+<!--<br>-->
+<!--{% include donate.html %}-->
 <br>
-{% include donate.html %}
 <br>
-<br>
+или расскажете, как использовали прошлогодний круглендарь. Если сфотографируете — вообще круто.
+
 {% include disqus.html id="kruglendar-2016" %}
