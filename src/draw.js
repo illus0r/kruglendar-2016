@@ -528,6 +528,43 @@ function draw(){
     })
   .text("2016");
 
+  //var copyrights = svg.append("text")
+   //.attr({ 
+     //style: "font-size:20.22219467px;text-align:center;line-height:125%;text-anchor:middle;font-family:Bebas Neue;",
+     //x: "873.11981",
+     //y: "-108.85584", 
+     ////transform: "scale(1,-1)",
+   //});
+
+  //copyrights.append("tspan") 
+    //.attr({
+      //x: "873.11981",
+      //y: "-108.85584",
+      //style: "font-family:Roboto Condensed Light;",
+    //})
+  //.text("Kruglendar — the poster-diary");
+
+  //copyrights.append("tspan") 
+    //.attr({
+      //x: "875.27234",
+      //y: "-83.578102",
+      //style: "font-family:Roboto Condensed Light",
+    //})
+  //.text("Free download from")
+  //.append("tspan")
+  //.attr({
+    //style: "font-family:Roboto Condensed",
+  //})
+  //.text("www.kruglendar.ru");
+
+  //copyrights.append("tspan") 
+    //.attr({
+      //x: "873.11981",
+      //y: "-58.300354",
+      //style: "font-family:Roboto Condensed Light;",
+    //})
+  //.text("© Ivan Dianov");
+
   var tree = svgExtra.append("g")
     .classed("tree",true)
     .attr({

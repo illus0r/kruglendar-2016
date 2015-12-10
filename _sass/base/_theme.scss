@@ -1,16 +1,17 @@
 body{
   $kruglendar-size: 2000px;
-  /*position: relative;*/
   &>.bg{
-    /*bottom: 0;*/
-    left: 0;
-    overflow: hidden;
-    max-height: $kruglendar-size / 2;
     height: 100%;
+    left: 0;
+    max-height: $kruglendar-size / 2;
+    overflow: hidden;
     position: absolute;
     right: 0;
     top: 0;
+    z-index: -1;
     &:after{
+      animation-delay: -280s;
+      animation: spin1 300s infinite linear;
       background: url(../img/krug.svg);
       content: ' ';
       display: block;
@@ -22,8 +23,6 @@ body{
       transform-origin:center center;
       width: $kruglendar-size;
       z-index: -1;
-      animation: spin1 300s infinite linear;
-      animation-delay: -280s;
     }
   }
 }
