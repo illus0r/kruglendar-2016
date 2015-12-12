@@ -1,0 +1,31 @@
+footer{
+  background: darken($color-blue, 30%);
+  color: white;
+  form{
+    margin: 40px auto 0;
+    padding: 50px 40px 60px;
+    width: $container-width;
+    p{
+      font-size: 0.9em;
+      margin-bottom: 1em;
+    }
+    div{
+      display: inline-block;
+    }
+    input{
+      border: none;
+      height: 30px;
+      padding: 0 1em;
+      vertical-align: top;
+    }
+    input[type="submit"]{
+      background: $color-blue;
+      color: white;
+      cursor: pointer;
+      font-family: $font-family-sans;
+      &:hover{
+        background: lighten($color-blue, 10%);
+      }
+    }
+  }
+}

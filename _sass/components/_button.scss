@@ -1,8 +1,26 @@
 .btn{
-  background: #0195d5;
+  background: $color-blue;
+  /*border-bottom-color: darken($color-blue, 5%);*/
+  /*border-bottom-style: solid;*/
+  /*border-bottom-width: 5px;*/
   color: white;
+  display: inline-block;
+  font-family: $font-family-condensed;
   font-weight: normal;
+  /*margin-top: 0;*/
   padding: 0.3em 1em 0.4em;
   text-decoration: none;
-  font-family: $font-family-condensed;
+  /*transition: 0.2s all;*/
+  &:active{
+    background: lighten($color-blue, 5%);
+  }
+  &:hover{
+    background: darken($color-blue, 5%);
+    /*border-bottom-color: darken($color-blue, 100%);*/
+    /*border-bottom-width: 0;*/
+    /*margin-top: 5px;*/
+  }
+  &:visited{
+    color: white;
+  }
 }
