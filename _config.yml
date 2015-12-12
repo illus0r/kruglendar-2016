@@ -5,7 +5,6 @@ email: ivan@dianov.org
 
 url:   http://kruglendar.ru # the base hostname & protocol for your site
 repo:  https://github.com/illus0r/kruglendar-2016/tree/gh-pages/src
-baseurl: /kruglendar-2016
 
 # Build settings
 markdown: kramdown
