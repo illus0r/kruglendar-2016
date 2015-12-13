@@ -47,4 +47,4 @@ title: Круглендарь 2016
 …или расскажете, как использовали прошлогодний круглендарь. Сфотографируете — вообще круто!
 <br>
 <br>
-{% include disqus.html id="kruglendar-2016" %}
+{% include comments.html id="kruglendar-2016" %}
