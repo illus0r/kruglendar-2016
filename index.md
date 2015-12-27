@@ -23,7 +23,7 @@ title: Круглендарь 2016
 
 ![Круглендарь 2016](./src/kruglendar-2016.png){: .teaser}
 
-<a href="src/kruglendar-2016.pdf" class="btn" target="_blank">Скачать круглендарь 2016 (английская версия)</a>
+<a href="src/kruglendar-2016.pdf" class="btn" target="_blank">Скачать круглендарь 2016</a>
 
 1. Распечатайте на формате А1
 1. Повесьте на стенку, рядом — фломастер.

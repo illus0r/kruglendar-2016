@@ -1,7 +1,7 @@
 //Changable variables
 //relative to size
 var svg_size = [2104.72, 2979.92],
-    center = [0.5, 0.5];
+    center = [0.5, 0.4698];
 //abs
 //var gap = 0.1, // gap for new year
 var gap = 0.01, // gap for new year
@@ -38,9 +38,15 @@ var dateSeparator = 0.0002*svg_size[0];
 //var fontFamily = "msam10";
 //font-family: 'Sorren Ex Bold'
 //font-family: 'Sorren Ex Medium'
-var fontFamilyMonth = "Bebas Neue Thin";
-var fontFamilyMonthWeight = 100;
+var fontFamilyMonth = "Bebas Neue Light";
+var fontFamilyMonthWeight = "100";
 var monthes_font_size = 2.5*svg_size[1]/150;
+//var monthes_radius = R*0.78;
+var monthes_radius = R;
+//var skew_factor = 1.2;
+var skew_factor = 0; // disable skewing
+var description_pos = [0.5, 0.98];
+var decoration_font_size = R*0.018;
 
 var paddVer = 0.001*R;
 var paddHor = 0.003*R;
@@ -310,7 +316,8 @@ function draw(){
     .append("svg")
     .attr({
       width: svg_size[0],
-      height: svg_size[1]	
+      height: svg_size[1],
+      style: "background: white;",
     });
   //// Helper circle
   //svg.append("circle")
@@ -409,8 +416,7 @@ function draw(){
           var dx = R*(d.theta - thetaPrev); 
           thetaPrev = d.theta;
           roPrev = roCurr;
-          return "skewY("+Math.atan(dy/dx)*180/pi*1.2+")"; 
-          //1.2 is a hack
+          return "skewY("+Math.atan(dy/dx)*180/pi*skew_factor+")"; 
         },
         style: function(d){
           var fontSizeKoef = 1.0;
@@ -450,8 +456,8 @@ function draw(){
   }
 
   var arc = d3.svg.arc()
-    .innerRadius(R)
-    .outerRadius(R)
+    .innerRadius(monthes_radius)
+    .outerRadius(monthes_radius)
     .startAngle(-pi/4)
     .endAngle(pi/4);
   var text_monthes = calendar.append("g")
@@ -498,28 +504,60 @@ function draw(){
       y: 0,
     });
 
-  var svgExtra = svg.append("g")
+  var description = svg.append("text")
     .classed("extra", true)
     .attr({
       transform: "translate("
-      + svg_size[0]*center[0] 
+      + svg_size[0]*description_pos[0] 
       + "," 
-      + svg_size[1]*center[1]
+      + svg_size[1]*description_pos[1]
       + ")",
+     style: "font-size:"+decoration_font_size+"px;text-align:center;text-anchor:middle;font-family:Roboto Condensed;letter-spacing:0.01em;",
     });
-  var extraLabel = svgExtra.append("g")
-    .attr({
-      transform: "translate(0 10) scale(0.4)",
-    });
+  description.append("tspan")
+    .attr({ 
+      "xml:space": "preserve",
+    })
+    .text("Kruglendar — the poster diary. Download from ");
+  description.append("tspan")
+    .attr({ 
+      style: "font-weight: bold; /*text-decoration: underline;*/ fill: #0195d5;",
+    })
+    .text("www.kruglendar.ru");
+  description.append("tspan")
+    .attr({ 
+      "xml:space": "preserve",
+    })
+    .text(" for free");
+    //.text(" for free · ");
+  //description.append("tspan")
+    //.attr({
+      //transform: "scale(-1)", //don't work :(
+    //})
+    //.text("©");
+  //description.append("tspan")
+    //.text(" Ivan Dianov");
+  //var extraLabel = svgExtra.append("g")
+    //.attr({
+      //transform: "translate(0 10) scale(0.4)",
+    //});
     
-  extraLabel.append("text")
+  var label = svg.append("g")
+  .attr({
+    transform: "translate("
+    + (svg_size[0]*center[0])
+    + "," 
+    + (svg_size[1]*center[1] + R*0.034)
+    + ") scale(0.4)",
+  });
+  label.append("text")
     .text("Kruglendar")
     .attr({
       x: 0,
       y: 60,
       style: "text-anchor: middle;font-size: 40px; letter-spacing: 5.4px; font-family:'Bebas Neue';",
     }); 
-  extraLabel.append("text")
+  label.append("text")
     .attr({
       x: "0.017473536",
       y: "0.48287916",
@@ -534,7 +572,8 @@ function draw(){
      //x: "873.11981",
      //y: "-108.85584", 
      ////transform: "scale(1,-1)",
-   //});
+   //})
+  //.text("© Ivan Dianov");
 
   //copyrights.append("tspan") 
     //.attr({
@@ -565,10 +604,14 @@ function draw(){
     //})
   //.text("© Ivan Dianov");
 
-  var tree = svgExtra.append("g")
+  var tree = svg.append("g")
     .classed("tree",true)
     .attr({
-      transform: "translate(4 "+ -807 +") scale(3)",
+      transform: "translate("
+      + (svg_size[0]*center[0] + R*0.004204)
+      + "," 
+      + (svg_size[1]*center[1] - R*0.959111)
+      + ") scale(3)",
     });
     tree.append("path")
       .attr({
@@ -590,6 +633,7 @@ function draw(){
         d: "m 0.01539742,-3.3436 0.28055,0.7187 0.77022998,0.045 -0.59682998,0.4889 0.19547,0.7463 -0.64942,-0.4165 -0.64942,0.4165 0.19547,-0.7463 -0.59683002,-0.4889 0.77022002,-0.045 z",
         style: "fill:#ff1919;",
       });
+
 
   //// Draw hypotrochoid path (regualr month length)
   //var line = d3.svg.line();
