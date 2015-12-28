@@ -1,7 +1,5 @@
-Kruglendar 2016
+Kruglendar 2016 — the diary poster
 ===
-The diary poster
----
 
 Hi there! *Kruglendar* is a minimalistic round calendar with a plenty of white space to make notes. I use it for sketching past events and planning.
 
