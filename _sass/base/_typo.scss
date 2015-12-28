@@ -22,7 +22,7 @@ h1,h2,h3,h4{
   font-family: $font-family-sans;
 }
 p{
-  margin: 0.5em 0;
+  margin: 1em 0;
   &.description{ 
     font-family: $font-family-sans;
     font-size: $font-size * $header-scale * $header-scale;
@@ -34,15 +34,16 @@ ol, ul{
   font-size: 0.8em;
 }
 ul{
-  margin: 0.8em 0;
+  margin: 0 0 0 1em;
   li{
     &:before{
       @extend .star;
       content: " ";
       display: inline-block;
       height: 1em;
-      padding-left: 0.3em;
       width: 1em;
+      margin-right: 0.3em;
+      margin-left: -1.3em;
     }
   }
 }
