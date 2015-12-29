@@ -14,7 +14,7 @@ I'm <a href="mailto:{{ site.email }}" target="_blank">Ivan Dianov</a>, designer 
 
 ![Kruglendar 2016](../src/kruglendar-2016.png){: .teaser}
 
-<a href="src/kruglendar-2016.pdf" class="btn" target="_blank">Download kruglendar 2016</a>
+<a href="../src/kruglendar-2016.pdf" class="btn" target="_blank">Download kruglendar 2016</a>
 
 1. Print on А1 format
 1. Put it on a wall, place a marker beside.
