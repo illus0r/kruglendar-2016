@@ -33,7 +33,8 @@ Feel free to fork and customize! Some tips may help you:
 * Sometimes font size of dates renders smaller. To avoid this zoom your brouser page as much as possible.
 * If you want to use webfonts, you must comment a line `draw();` in code and call it later from a js console: browser needs time to load webfonts.
 
-[Demo](http://kruglendar.ru/src/index.html)
+[Demo](http://kruglendar.ru/src/index.html)  
+Rendering may take a minute or two.
 
 License
 ---
