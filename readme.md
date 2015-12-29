@@ -30,7 +30,7 @@ Feel free to fork and customize! Some tips may help you:
 * The script resides in [/src folder](https://github.com/illus0r/kruglendar-2016/tree/gh-pages/src)
 * Use the [SVG Crowbar bookmarklet](http://nytimes.github.io/svg-crowbar/) to save an `*.svg` file.
 * Kruglendar uses the [Bebas Neue font family](http://www.fontfabric.com/bebas-neue/), you have to install it beforehand.
-* Sometimes font size of dates renders smaller. To avoid this zoom your brouser page as much as possible.
+* Sometimes font size of dates renders smaller. To avoid this zoom your browser page as much as possible.
 * If you want to use webfonts, you must comment a line `draw();` in code and call it later from a js console: browser needs time to load webfonts.
 
 License
