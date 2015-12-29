@@ -39,4 +39,4 @@ Please, share with your friends…
 <!--{% include donate.html %}-->
 …or give me some feedback!
 <br>
-{% include comments.html id="kruglendar-2016" %}
+{% include comments.html id="kruglendar-2016-en" %}
