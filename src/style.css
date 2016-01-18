@@ -6,6 +6,16 @@ body{
 
 .customizer {
   font-family: Arial, sans-serif;
+  margin: 2em 0;
+}
+
+.customizer .field{
+  display: block;
+  margin-bottom: 1em;
+}
+
+.customizer .field-webfont{
+  display: none;
 }
 
 .customizer label {
