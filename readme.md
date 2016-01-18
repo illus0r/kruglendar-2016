@@ -34,7 +34,7 @@ Feel free to fork and customize! Some tips may help you:
 * If you want to use webfonts, you must comment a line `draw();` in code and call it later from a js console: browser needs time to load webfonts.
 
 [Demo](http://kruglendar.ru/src/index.html)  
-Rendering may take a minute or two.
+Rendering may take a minute or two. [Alex7Kom](https://github.com/Alex7Kom) implemented i18n and font customization.
 
 License
 ---
