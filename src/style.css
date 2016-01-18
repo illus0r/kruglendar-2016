@@ -1,0 +1,27 @@
+/* Styles apply to web page only and don't impact on svg */
+
+body{
+  background: teal;
+}
+
+.customizer {
+  font-family: Arial, sans-serif;
+}
+
+.customizer label {
+  color: #fff;
+  display: inline-block;
+  margin-right: 10px;
+  text-align: right;
+  width: 160px;
+}
+
+.customizer input[type="submit"]{
+  margin-left: 170px;
+}
+
+@media print {
+  .customizer {
+    display: none;
+  }
+}

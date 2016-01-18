@@ -1,28 +1,13 @@
 <html>
 <head>
 <meta charset="utf-8">
-<style type="text/css">
-.customizer {
-  font-family: Arial, sans-serif;
-}
-
-.customizer label {
-  color: #fff;
-}
-
-@media print {
-  .customizer {
-    display: none;
-  }
-}
-</style>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment-with-locales.min.js"></script>
+<link rel="stylesheet" href="style.css">
 </head>
-<body style="background: teal;">
+<body>
 <form id="customizer" class="customizer" method="GET">
-  <label for="locale">Locale</label>
-  <select name="locale" id="locale">  
+  <label for="locale">Locale</label><select name="locale" id="locale">  
     <option value="af">
       Afrikaans
     </option>
@@ -410,21 +395,18 @@
   <br>
   <br>
 
-  <label for="month_font">Month Font</label>
-  <input type="text" id="month_font" name="month_font" size="30">
+  <label for="month_font">Month Font</label><input type="text" id="month_font" name="month_font" size="30">
   <br>
   <br>
 
-  <label for="month_font_weight">Month Font Weight</label>
-  <input type="text" id="month_font_weight" name="month_font_weight" size="5">
+  <label for="month_font_weight">Month Font Weight</label><input type="text" id="month_font_weight" name="month_font_weight" size="5">
   <br>
   <br>
 
-  <label for="external_css">WebFont CSS URL</label>
-  <input type="text" id="external_css" name="external_css" size="50">
+  <!--<label for="external_css">WebFont CSS URL</label><input type="text" id="external_css" name="external_css" size="50">-->
 
-  <br>
-  <br>
+  <!--<br>-->
+  <!--<br>-->
   <input type="submit" value="Generate">
 </form>
 <script language="javascript" src="draw.js"></script>
