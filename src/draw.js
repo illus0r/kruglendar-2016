@@ -1,3 +1,79 @@
+var defaultParams = {
+  locale: "en",
+  month_font: "Bebas Neue Light",
+  month_font_weight: "100",
+  external_css: ""
+};
+
+var userParams = {};
+if (document.location.search.length > 0) {
+  document.location.search
+    .substr(1)
+    .split("&")
+    .forEach(function (pair) {
+      var params = pair
+        .replace(/\+/g, "%20")
+        .split("=")
+        .map(decodeURIComponent);
+      userParams[params[0]] = params[1];
+    });
+}
+
+var params = {};
+
+// set params and populate form
+Object.keys(defaultParams).forEach(function (param) {
+  params[param] = userParams[param] || defaultParams[param];
+  document.getElementById(param).value = params[param];
+});
+
+var drawImmediately = true;
+
+// load external css
+if (params.external_css !== "") {
+  drawImmediately = false;
+  var link = document.createElement("link");
+  link.addEventListener("load", function () {
+    setTimeout(function () {
+      draw();
+    }, 1000);
+  }, false);
+  link.setAttribute("href", params.external_css);
+  link.setAttribute("rel", "stylesheet");
+  link.setAttribute("type", "text/css");
+  document.head.appendChild(link);
+}
+
+// set locale
+document.body.setAttribute('lang', params.locale);
+moment.locale(params.locale);
+
+// kerning data
+var monthKerning = {
+  "Bebas Neue Light": {
+    "en": [
+      "0 0 0 1.55 -0.85000008 0 -2.4299998",
+      "0 0 0 0 0 -0.95000011 -0.54999995 -0.98999995",
+      "",
+      "0 0 0 2.1899998 2.1399999",
+      "0 0 -4.4199996",
+      "",
+      "0 1.7300001 1.1800001 -8.46",
+      "0 0 0 0 0 -2.5899997",
+      "0 0 0 -3.1299989 -1.4000001 1.2 1.2299999",
+      "0 0 -2.0999999 -3.4299994",
+      "0 0 -2.1399999 -1.42 -0.75000006 1",
+      "0 0 -1.42 -1.2900001 0 1.33"
+    ]
+  }
+};
+
+var chosenKerning = [];
+
+if (monthKerning[fontFamilyMonth] && monthKerning[fontFamilyMonth][params.locale]) {
+  chosenKerning = monthKerning[fontFamilyMonth][params.locale];
+}
+
 //Changable variables
 //relative to size
 var svg_size = [2104.72, 2979.92],
@@ -38,8 +114,8 @@ var dateSeparator = 0.0002*svg_size[0];
 //var fontFamily = "msam10";
 //font-family: 'Sorren Ex Bold'
 //font-family: 'Sorren Ex Medium'
-var fontFamilyMonth = "Bebas Neue Light";
-var fontFamilyMonthWeight = "100";
+var fontFamilyMonth = params.month_font;
+var fontFamilyMonthWeight = params.month_font_weight;
 var monthes_font_size = 2.5*svg_size[1]/150;
 //var monthes_radius = R*0.78;
 var monthes_radius = R;
@@ -262,7 +338,7 @@ function draw(){
         date: dateString, 
         weekend: isWeekend, 
         month: dateFormatMonth(d),
-        monthName: dateFormatMonthName(d),
+        monthName: moment(d).format('MMMM'),
         color: "red", //tmp
       };
     });
@@ -274,20 +350,6 @@ function draw(){
   });
 
   var previousLen = 0;
-  monthKerning = [
-    "0 0 0 1.55 -0.85000008 0 -2.4299998",
-    "0 0 0 0 0 -0.95000011 -0.54999995 -0.98999995",
-    "",
-    "0 0 0 2.1899998 2.1399999",
-    "0 0 -4.4199996",
-    "",
-    "0 1.7300001 1.1800001 -8.46",
-    "0 0 0 0 0 -2.5899997",
-    "0 0 0 -3.1299989 -1.4000001 1.2 1.2299999",
-    "0 0 -2.0999999 -3.4299994",
-    "0 0 -2.1399999 -1.42 -0.75000006 1",
-    "0 0 -1.42 -1.2900001 0 1.33"
-    ];
   var monthes = d3.nest()
   .key(function(d){ return d.month; })
   .entries(dates)
@@ -301,7 +363,7 @@ function draw(){
       previousLenRelative: pLen / dates.length,
       color: color,
       values: d.values,
-      dx: monthKerning.shift(),
+      dx: chosenKerning.shift() || "",
     }; 
   });
 
@@ -646,4 +708,6 @@ function draw(){
     //});
 }
 
-draw();
+if (drawImmediately) {
+  draw();
+}
